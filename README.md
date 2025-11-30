@@ -24,14 +24,14 @@
 在 PowerShell 中运行：
 
 ```powershell
-irm https://raw.githubusercontent.com/用户名/meta-infra/main/bootstrap/init.ps1 | iex
+irm https://raw.githubusercontent.com/exusiaiw/meta-infra/main/bootstrap/init.ps1 | iex
 ```
 
 ### 方法 2：手动安装
 
 ```powershell
 # 1. 克隆仓库
-git clone https://github.com/用户名/meta-infra.git
+git clone https://github.com/exusiaiw/meta-infra.git
 cd meta-infra
 
 # 2. 安装核心工具

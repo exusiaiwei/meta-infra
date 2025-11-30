@@ -1,32 +1,34 @@
+# -*- coding: utf-8 -*-
 # ================================================================================================
 # meta-infra - Bootstrap Loader (BIOS Layer)
 # ================================================================================================
-# 用途：轻量级引导程序，仅负责：
-#   1. 检查并安装 Git
-#   2. 克隆仓库
-#   3. 启动 Mise 任务系统
+# Purpose: Lightweight bootstrap program, only responsible for:
+#   1. Check and install Git
+#   2. Clone repository
+#   3. Start Mise task system
 #
-# 设计理念：最小化 PowerShell 代码，所有复杂逻辑交给 Mise + Nushell
+# Design: Minimize PowerShell code, delegate complex logic to Mise + Nushell
 #
-# 使用方式：
-#   irm https://raw.githubusercontent.com/用户名/meta-infra/main/bootstrap/init.ps1 | iex
+# Usage:
+#   irm https://raw.githubusercontent.com/exusiaiw/meta-infra/main/bootstrap/init.ps1 | iex
 # ================================================================================================
 
 #Requires -Version 5.1
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # ========================================
-# 配置
+# Configuration
 # ========================================
-$REPO_URL = "https://github.com/exusiaiw/meta-infra.git"  # TODO: 替换
+$REPO_URL = "https://github.com/exusiaiw/meta-infra.git"
 $INSTALL_DIR = Join-Path $env:USERPROFILE "meta-infra"
 
 # ========================================
-# 最小化辅助函数
+# Minimal Helper Functions
 # ========================================
 function Write-Step {
     param([string]$Message, [string]$Color = "Cyan")
-    Write-Host "➤ $Message" -ForegroundColor $Color
+    Write-Host ">> $Message" -ForegroundColor $Color
 }
 
 function Test-CommandExists {
@@ -36,72 +38,72 @@ function Test-CommandExists {
 }
 
 # ========================================
-# BIOS 引导流程
+# BIOS Bootstrap Process
 # ========================================
 function Start-Bootstrap {
     Clear-Host
     Write-Host ""
-    Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
-    Write-Host "  🚀 meta-infra Bootstrap Loader" -ForegroundColor Cyan
-    Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+    Write-Host "============================================" -ForegroundColor Cyan
+    Write-Host "  meta-infra Bootstrap Loader" -ForegroundColor Cyan
+    Write-Host "============================================" -ForegroundColor Cyan
     Write-Host ""
 
-    # 步骤 1: 检查/安装 Git
-    Write-Step "检查 Git..."
+    # Step 1: Check/Install Git
+    Write-Step "Checking Git..."
     if (-not (Test-CommandExists "git")) {
-        Write-Step "Git 未安装，正在安装..." "Yellow"
+        Write-Step "Git not installed, installing..." "Yellow"
 
         if (-not (Test-CommandExists "winget")) {
             Write-Host ""
-            Write-Host "❌ 需要 Winget 来安装 Git" -ForegroundColor Red
+            Write-Host "[ERROR] Winget is required to install Git" -ForegroundColor Red
             Write-Host ""
-            Write-Host "请先安装 App Installer:" -ForegroundColor Yellow
-            Write-Host "  1. 访问: https://aka.ms/getwinget"
-            Write-Host "  2. 或运行: winget install Git.Git"
+            Write-Host "Please install App Installer first:" -ForegroundColor Yellow
+            Write-Host "  1. Visit: https://aka.ms/getwinget"
+            Write-Host "  2. Or run: winget install Git.Git"
             Write-Host ""
             exit 1
         }
 
         winget install Git.Git --silent --accept-package-agreements --accept-source-agreements
 
-        # 刷新环境变量
+        # Refresh environment variables
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
     }
 
-    Write-Step "✓ Git 已就绪" "Green"
+    Write-Step "[OK] Git ready" "Green"
 
-    # 步骤 2: 克隆/更新仓库
+    # Step 2: Clone/Update repository
     if (Test-Path $INSTALL_DIR) {
-        Write-Step "仓库已存在，正在更新..."
+        Write-Step "Repository exists, updating..."
         Push-Location $INSTALL_DIR
         git pull
         Pop-Location
     } else {
-        Write-Step "克隆仓库: $REPO_URL"
+        Write-Step "Cloning repository: $REPO_URL"
         git clone $REPO_URL $INSTALL_DIR
     }
 
-    Write-Step "✓ 仓库已就绪" "Green"
+    Write-Step "[OK] Repository ready" "Green"
 
-    # 步骤 3: 移交给 Mise
+    # Step 3: Hand over to Mise
     Write-Host ""
-    Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
-    Write-Host "  🎯 启动 Mise 任务系统" -ForegroundColor Cyan
-    Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+    Write-Host "============================================" -ForegroundColor Cyan
+    Write-Host "  Starting Mise Task System" -ForegroundColor Cyan
+    Write-Host "============================================" -ForegroundColor Cyan
     Write-Host ""
 
     Push-Location $INSTALL_DIR
 
-    # 检查 Mise
+    # Check Mise
     if (Test-CommandExists "mise") {
-        Write-Step "Mise 已安装，启动安装向导..."
+        Write-Step "Mise installed, starting wizard..."
         mise run bootstrap
     } else {
-        Write-Step "Mise 未安装，请先运行 Winget 安装:" "Yellow"
+        Write-Step "Mise not installed, please run:" "Yellow"
         Write-Host ""
         Write-Host "  winget configure manifests/core/base.yaml" -ForegroundColor Cyan
         Write-Host ""
-        Write-Host "然后运行:" -ForegroundColor Yellow
+        Write-Host "Then run:" -ForegroundColor Yellow
         Write-Host "  mise run bootstrap" -ForegroundColor Cyan
         Write-Host ""
     }
@@ -109,5 +111,5 @@ function Start-Bootstrap {
     Pop-Location
 }
 
-# 运行引导程序
+# Run bootstrap
 Start-Bootstrap

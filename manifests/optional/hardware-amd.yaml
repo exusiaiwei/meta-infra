@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# ================================================================================================
+# meta-infra - Optional: AMD Hardware
+# ================================================================================================
+# 用途：AMD 显卡相关工具
+# 优先级：🔵 可选（仅 AMD 显卡用户）
+# 硬件要求：AMD Radeon 系列显卡
+#
+# 安装方式：
+#   winget configure manifests/optional/hardware-amd.yaml
+#
+# ⚠️ 注意：
+#   - 仅适用于 AMD 显卡
+#   - NVIDIA 显卡用户请使用 hardware-nvidia.yaml
+#   - 安装前请确认您的显卡品牌
+# ================================================================================================
+
+properties:
+  configurationVersion: 0.2.0
+
+resources:
+  # ========================================
+  # AMD Adrenalin 驱动软件
+  # ========================================
+  # - resource: Microsoft.WinGet.DSC/WinGetPackage
+  #   id: amd_adrenalin
+  #   directives:
+  #     description: 安装 AMD Adrenalin 驱动软件
+  #     allowPrerelease: false
+  #   settings:
+  #     id: <需要查找>
+  #     source: winget
+
+  # 注意：AMD 驱动通常建议从官网下载
+  # Winget 中可能没有最新版本
+  # 待确认是否有可用的 Winget 包

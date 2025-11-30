@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# ================================================================================================
+# meta-infra - Standard: Academic
+# ================================================================================================
+# 用途：学术工具（笔记、文献管理、Office）
+# 优先级：🟡 推荐（Surface Pro X 主要使用）
+# ================================================================================================
+
+properties:
+  configurationVersion: 0.2.0
+
+resources:
+  # === 笔记与知识管理 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: obsidian
+    settings:
+      id: Obsidian.Obsidian
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: anki
+    settings:
+      id: Anki.Anki
+      source: winget
+
+  # === 文献管理 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: zotero
+    settings:
+      id: DigitalScholar.Zotero
+      source: winget
+
+  # === Office 套件 ===
+  # Microsoft 365 - 需要确认 Winget ID

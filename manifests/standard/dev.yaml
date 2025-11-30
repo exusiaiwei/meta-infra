@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# ================================================================================================
+# meta-infra - Standard: Development
+# ================================================================================================
+# 用途：开发环境（IDE、编辑器、构建工具、容器）
+# 优先级：🟡 推荐
+# ================================================================================================
+
+properties:
+  configurationVersion: 0.2.0
+
+resources:
+  # === IDE 与编辑器 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: vscode
+    settings:
+      id: Microsoft.VisualStudioCode
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: cursor
+    settings:
+      id: Anysphere.Cursor
+      source: winget
+
+  # Antigravity - 需要查找 Winget ID
+
+  # === C++ 构建环境 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: vs_buildtools
+    settings:
+      id: Microsoft.VisualStudio.2022.BuildTools
+      source: winget
+
+  # === 开发工具 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: docker
+    settings:
+      id: Docker.DockerDesktop
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: github_cli
+    settings:
+      id: GitHub.cli
+      source: winget

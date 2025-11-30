@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# ================================================================================================
+# meta-infra - Standard: Communication
+# ================================================================================================
+# 用途：通讯工具（即时通讯、会议）
+# 优先级：🟡 推荐
+# ================================================================================================
+
+properties:
+  configurationVersion: 0.2.0
+
+resources:
+  # === 即时通讯 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: wechat
+    settings:
+      id: Tencent.WeChat
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: qq
+    settings:
+      id: Tencent.QQ.NT
+      source: winget
+
+  # === 会议工具 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: teams
+    settings:
+      id: Microsoft.Teams
+      source: winget

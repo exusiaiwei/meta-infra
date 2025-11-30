@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# ================================================================================================
+# meta-infra - Standard: Media
+# ================================================================================================
+# 用途：多媒体工具（视频播放、文件转换）
+# 优先级：🟡 推荐
+# ================================================================================================
+
+properties:
+  configurationVersion: 0.2.0
+
+resources:
+  # === 视频播放 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: potplayer
+    settings:
+      id: Daum.PotPlayer
+      source: winget
+
+  # === 文件转换 ===
+  # File Converter - 需要查找 Winget ID

@@ -1,0 +1,368 @@
+# ================================================================================================
+# meta-infra - Mise 配置文件
+# ================================================================================================
+# 用途：定义项目级别的任务和工具版本
+# Mise 是整个项目的核心编排工具，负责：
+#   1. 任务编排 (Task Runner)
+#   2. 工具版本管理 (类似 Nvm/Pyenv/Rbenv)
+#   3. 环境变量管理
+#
+# 文档：https://mise.jdx.dev/
+# ================================================================================================
+
+# ========================================
+# 工具版本管理
+# ========================================
+# 定义项目依赖的工具及其版本
+# 当进入此目录时，Mise 会自动激活这些工具
+
+[tools]
+# ========================================
+# 核心语言运行时
+# ========================================
+python = "3.12"           # Python 解释器（固定版本，稳定）
+node = "lts"              # Node.js LTS 版本（用于文档系统和 npm 工具）
+
+# ========================================
+# 文档与排版工具
+# ========================================
+quarto = "latest"         # 科学文档生成工具
+typst = "latest"          # 现代文档排版系统（类似 LaTeX）
+
+# ========================================
+# 多媒体处理
+# ========================================
+ffmpeg = "latest"         # 音频/视频转换和处理
+
+# ========================================
+# 数据处理工具
+# ========================================
+jq = "latest"             # JSON 查询和处理
+yq = "latest"             # YAML/XML 查询和处理
+ripgrep = "latest"        # 快速文本搜索（rg 命令）
+
+# ========================================
+# Python 包管理
+# ========================================
+pixi = "latest"           # 现代 Python/Conda 包管理器
+
+# ========================================
+# AI CLI 工具（通过 npm 安装）
+# ========================================
+"npm:@anthropics/claude-cli" = "latest"  # Anthropic Claude CLI
+"npm:@google-ai/gemini-cli" = "latest"   # Google Gemini CLI
+
+# ========================================
+# (可选) 其他语言运行时
+# ========================================
+# rust = "latest"         # Rust 工具链
+# go = "latest"           # Go 编译器
+
+# ========================================
+# 环境变量
+# ========================================
+[env]
+# 设置项目级别的环境变量
+# PAGER = "cat"           # 禁用分页器
+# EDITOR = "code"         # 设置默认编辑器
+
+# ========================================
+# 核心任务定义
+# ========================================
+# 架构设计：
+#   PowerShell (BIOS层) → Mise (OS层) → Nushell (应用层)
+
+# ========== Bootstrap 任务（从 PowerShell 引导启动）==========
+
+[tasks.bootstrap]
+description = "【完整安装向导】交互式安装流程 (从 init.ps1 调用)"
+run = "nu scripts/bootstrap.nu"
+
+[tasks."bootstrap:quick"]
+description = "【快速安装】仅安装核心+标准层"
+run = """
+winget configure manifests/core/base.yaml --accept-configuration-agreements
+ls manifests/standard/*.yaml | each { |file| winget configure $file.name --accept-configuration-agreements }
+"""
+
+[tasks."bootstrap:minimal"]
+description = "【最小安装】仅安装核心层"
+run = "winget configure manifests/core/base.yaml --accept-configuration-agreements"
+
+# ========== 初始化任务 ==========
+
+[tasks.init]
+description = "【阶段 2】初始化所有配置（在 Winget DSC 完成后运行）"
+run = """
+nu -c '
+    print ""
+    print "🚀 开始初始化 meta-infra 配置系统..."
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    print ""
+
+    # 1. 验证依赖
+    print "📋 步骤 1/4: 验证依赖工具..."
+    mise run verify
+    print ""
+
+    # 2. 配置 Nushell
+    print "⚙️  步骤 2/4: 配置 Nushell..."
+    mise run setup:nushell
+    print ""
+
+    # 3. 配置 Starship
+    print "⚙️  步骤 3/4: 配置 Starship..."
+    mise run setup:starship
+    print ""
+
+    # 4. 配置 Windows Terminal (可选)
+    print "⚙️  步骤 4/4: 配置 Windows Terminal..."
+    mise run setup:terminal
+    print ""
+
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    print "✅ 初始化完成！"
+    print ""
+    print "🎯 下一步："
+    print "   1. 重启终端以应用新配置"
+    print "   2. 运行 \\"nu\\" 进入 Nushell"
+    print "   3. 运行 \\"mise run status\\" 查看系统状态"
+    print ""
+'
+"""
+
+[tasks.verify]
+description = "验证所有依赖工具是否已正确安装"
+run = """
+nu scripts/verify-install.nu
+"""
+
+# ========== 设置任务 ==========
+
+[tasks."setup:nushell"]
+description = "配置 Nushell（复制配置文件到用户目录）"
+run = """
+nu -c '
+    print "⚙️  配置 Nushell..."
+
+    # 创建配置目录
+    let config_dir = ($env.APPDATA | path join "nushell")
+    mkdir $config_dir
+
+    # 复制配置文件（暂时直接复制，未来使用 Chezmoi）
+    if ("dotfiles/config.nu" | path exists) {
+        cp dotfiles/config.nu $config_dir
+        print "  ✓ 已复制 config.nu"
+    } else {
+        print "  ⚠️  config.nu 不存在，将使用默认配置"
+    }
+
+    if ("dotfiles/env.nu" | path exists) {
+        cp dotfiles/env.nu $config_dir
+        print "  ✓ 已复制 env.nu"
+    } else {
+        print "  ⚠️  env.nu 不存在，将使用默认配置"
+    }
+
+    print "✅ Nushell 配置完成"
+'
+"""
+
+[tasks."setup:starship"]
+description = "配置 Starship 提示符"
+run = """
+nu -c '
+    print "⚙️  配置 Starship..."
+
+    # 创建配置目录
+    let config_dir = ($env.USERPROFILE | path join ".config")
+    mkdir $config_dir
+
+    # 复制 Starship 配置
+    if ("dotfiles/starship.toml" | path exists) {
+        cp dotfiles/starship.toml ($config_dir | path join "starship.toml")
+        print "  ✓ 已复制 starship.toml"
+    } else {
+        print "  ⚠️  starship.toml 不存在，将使用默认配置"
+    }
+
+    print "✅ Starship 配置完成"
+'
+"""
+
+[tasks."setup:terminal"]
+description = "配置 Windows Terminal（可选）"
+run = """
+nu -c '
+    print "⚙️  配置 Windows Terminal..."
+
+    let terminal_dir = ($env.LOCALAPPDATA | path join "Packages" "Microsoft.WindowsTerminal_8wekyb3d8bbwe" "LocalState")
+
+    if ($terminal_dir | path exists) {
+        if ("dotfiles/windows-terminal-settings.json" | path exists) {
+            cp dotfiles/windows-terminal-settings.json ($terminal_dir | path join "settings.json")
+            print "  ✓ 已配置 Windows Terminal"
+        } else {
+            print "  ℹ️  未找到 Windows Terminal 配置文件，跳过"
+        }
+    } else {
+        print "  ℹ️  未安装 Windows Terminal，跳过配置"
+    }
+
+    print "✅ Windows Terminal 配置完成"
+'
+"""
+
+# ========== 维护任务 ==========
+
+[tasks.update]
+description = "更新所有工具和包"
+run = """
+nu -c '
+    print "📦 更新系统..."
+    print ""
+
+    # 更新 Winget 包
+    print "1️⃣  更新 Winget 包..."
+    winget upgrade --all --silent
+    print ""
+
+    # 更新 Mise 工具
+    print "2️⃣  更新 Mise 工具..."
+    mise upgrade
+    print ""
+
+    # 更新文档依赖（如果存在）
+    if ("docs/package.json" | path exists) {
+        print "3️⃣  更新文档依赖..."
+        cd docs
+        npm update
+        cd ..
+    }
+
+    print "✅ 所有工具已更新！"
+'
+"""
+
+[tasks.status]
+description = "显示系统状态和已安装工具"
+run = """
+nu -c '
+    print ""
+    print "📊 meta-infra 系统状态"
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    print ""
+
+    print "🛠️  核心工具版本："
+    print $"  Git:      (git --version | str trim)"
+    print $"  Mise:     (mise --version | str trim)"
+    print $"  Nushell:  (nu --version | str trim)"
+    print $"  Starship: (starship --version | str trim)"
+    print ""
+
+    print "📦 Mise 管理的工具："
+    mise list
+    print ""
+
+    print "💻 系统信息："
+    print $"  架构:     (sys host | get arch)"
+    print $"  操作系统: (sys host | get name) (sys host | get os_version)"
+    print ""
+'
+"""
+
+[tasks.clean]
+description = "清理临时文件和缓存"
+run = """
+nu -c '
+    print "🧹 清理缓存和临时文件..."
+
+    # 清理 Mise 缓存
+    print "  清理 Mise 缓存..."
+    mise cache clear
+
+    # 清理文档构建产物
+    if ("docs/dist" | path exists) {
+        print "  清理文档构建产物..."
+        rm -rf docs/dist
+    }
+
+    if ("docs/node_modules" | path exists) {
+        print "  清理 Node 模块..."
+        rm -rf docs/node_modules
+    }
+
+    print "✅ 清理完成！"
+'
+"""
+
+# ========== 文档任务 ==========
+
+[tasks."docs:init"]
+description = "初始化 Rspress 文档项目"
+run = """
+nu -c '
+    print "📚 初始化 Rspress 文档项目..."
+
+    if not ("docs/package.json" | path exists) {
+        cd docs
+        npm create rspress@latest
+        cd ..
+        print "✅ Rspress 初始化完成"
+    } else {
+        print "ℹ️  文档项目已存在"
+    }
+'
+"""
+
+[tasks."docs:dev"]
+description = "启动文档开发服务器"
+run = "cd docs && npm run dev"
+depends = ["docs:install"]
+
+[tasks."docs:build"]
+description = "构建文档静态站点"
+run = "cd docs && npm run build"
+depends = ["docs:install"]
+
+[tasks."docs:install"]
+description = "安装文档项目依赖"
+run = """
+nu -c '
+    if ("docs/package.json" | path exists) {
+        cd docs
+        npm install
+        cd ..
+    } else {
+        print "❌ 文档项目未初始化，请先运行: mise run docs:init"
+        exit 1
+    }
+'
+"""
+
+# ========== Chezmoi 任务（未来使用） ==========
+
+[tasks."chezmoi:init"]
+description = "【未来】初始化 Chezmoi（集成 Bitwarden）"
+run = """
+echo "⚠️  Chezmoi 集成暂未实现"
+echo "计划功能："
+echo "  - 从 Bitwarden 读取敏感配置"
+echo "  - 管理跨设备的 dotfiles"
+echo "  - 支持模板化配置"
+"""
+
+[tasks."chezmoi:apply"]
+description = "【未来】应用 Chezmoi 配置"
+run = "echo '暂未实现：chezmoi apply'"
+
+# ========================================
+# 任务别名
+# ========================================
+[alias]
+# 常用任务的简短别名
+i = "init"
+s = "status"
+u = "update"
+c = "clean"
+v = "verify"

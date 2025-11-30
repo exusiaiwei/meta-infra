@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# ================================================================================================
+# meta-infra - Core: Base
+# ================================================================================================
+# 用途：核心基础工具，所有设备必装
+# 优先级：🔴 最高
+#
+# 安装方式：
+#   winget configure manifests/core/base.yaml
+#
+# 包含工具（6个）：
+#   - Git: 版本控制
+#   - Mise: 环境与任务管理
+#   - Nushell: 现代化 Shell
+#   - Starship: Shell 提示符美化
+#   - Windows Terminal: 终端
+#   - NanaZip: 压缩工具
+# ================================================================================================
+
+properties:
+  configurationVersion: 0.2.0
+
+resources:
+  # ========================================
+  # Git - 版本控制
+  # ========================================
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: git
+    directives:
+      description: 安装 Git（版本控制系统）
+      allowPrerelease: false
+    settings:
+      id: Git.Git
+      source: winget
+
+  # ========================================
+  # Mise - 环境与任务管理
+  # ========================================
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: mise
+    directives:
+      description: 安装 Mise（环境管理 + 任务编排）
+      allowPrerelease: false
+    settings:
+      id: jdx.mise
+      source: winget
+    dependsOn:
+      - git
+
+  # ========================================
+  # Nushell - 现代化 Shell
+  # ========================================
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: nushell
+    directives:
+      description: 安装 Nushell（结构化 Shell）
+      allowPrerelease: false
+    settings:
+      id: Nushell.Nushell
+      source: winget
+
+  # ========================================
+  # Starship - Shell 提示符
+  # ========================================
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: starship
+    directives:
+      description: 安装 Starship（跨平台提示符）
+      allowPrerelease: false
+    settings:
+      id: Starship.Starship
+      source: winget
+    dependsOn:
+      - nushell
+
+  # ========================================
+  # Windows Terminal
+  # ========================================
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: windows_terminal
+    directives:
+      description: 安装 Windows Terminal（系统自带也要重装）
+      allowPrerelease: false
+    settings:
+      id: Microsoft.WindowsTerminal
+      source: winget
+
+  # ========================================
+  # NanaZip - 压缩工具
+  # ========================================
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: nanazip
+    directives:
+      description: 安装 NanaZip（现代化压缩工具）
+      allowPrerelease: false
+    settings:
+      id: M2Team.NanaZip
+      source: winget

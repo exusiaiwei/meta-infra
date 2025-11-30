@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# ================================================================================================
+# meta-infra - Standard: Tools
+# ================================================================================================
+# 用途：效率工具（系统增强、网络、下载、浏览器、卸载工具）
+# 优先级：🟡 推荐
+#
+# 安装方式：
+#   winget configure manifests/standard/tools.yaml
+# ================================================================================================
+
+properties:
+  configurationVersion: 0.2.0
+
+resources:
+  # === 系统增强 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: powertoys
+    settings:
+      id: Microsoft.PowerToys
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: flow_launcher
+    settings:
+      id: FlowLauncher.FlowLauncher
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: files_app
+    settings:
+      id: 49306atecsolution.FilesUWP
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: windhawk
+    settings:
+      id: RamenSoftware.Windhawk
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: auto_dark_mode
+    settings:
+      id: ArminOsaj.AutoDarkMode
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: mactype
+    settings:
+      id: MacType.MacType
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: yasb
+    settings:
+      id: AmN.yasb
+      source: winget
+
+  # === 网络与翻译 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: pot
+    settings:
+      id: Pylogmon.pot
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: adguard
+    settings:
+      id: AdGuard.AdGuard
+      source: winget
+
+  # === 下载工具 ===
+  # NanaGet - 需要查找 Winget ID
+
+  # === 文件复制工具 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: fastcopy
+    directives:
+      description: 安装 FastCopy（高速文件复制工具）
+    settings:
+      id: FastCopy.FastCopy
+      source: winget
+
+  # === 浏览器 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: zen_browser
+    settings:
+      id: Zen-Team.Zen-Browser
+      source: winget
+
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: edge
+    settings:
+      id: Microsoft.Edge
+      source: winget
+
+  # === 卸载工具 ===
+  - resource: Microsoft.WinGet.DSC/WinGetPackage
+    id: geek_uninstaller
+    directives:
+      description: 安装 Geek Uninstaller
+    settings:
+      id: GeekUninstaller.GeekUninstaller
+      source: winget

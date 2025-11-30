@@ -1,0 +1,85 @@
+# ================================================================================================
+# Starship 配置文件
+# ================================================================================================
+# 文档：https://starship.rs/config/
+# ================================================================================================
+
+# 格式定义
+format = """
+[┌─](bold green)$username$hostname$directory$git_branch$git_status
+[└─>](bold green) """
+
+# 右侧提示符
+right_format = """$cmd_duration$time"""
+
+# ========== 通用配置 ==========
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+# ========== 目录 ==========
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+# ========== Git 分支 ==========
+[git_branch]
+symbol = " "
+style = "bold purple"
+truncation_length = 20
+
+# ========== Git 状态 ==========
+[git_status]
+style = "bold yellow"
+conflicted = "🏳"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+# ========== 命令执行时间 ==========
+[cmd_duration]
+min_time = 500
+format = "took [$duration](bold yellow)"
+
+# ========== 时间 ==========
+[time]
+disabled = false
+format = '[$time](bold white)'
+time_format = "%T"
+
+# ========== 用户名 ==========
+[username]
+show_always = false
+format = "[$user]($style)@"
+style_user = "bold blue"
+
+# ========== 主机名 ==========
+[hostname]
+ssh_only = true
+format = "[$hostname]($style) in "
+style = "bold green"
+
+# ========== 语言版本显示 ==========
+[nodejs]
+symbol = " "
+format = "via [$symbol($version )]($style)"
+
+[python]
+symbol = " "
+format = 'via [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+
+[rust]
+symbol = " "
+format = "via [$symbol($version )]($style)"
+
+[package]
+symbol = "📦 "
+disabled = true

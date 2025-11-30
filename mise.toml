@@ -26,13 +26,15 @@ node = "lts"              # Node.js LTS 版本（用于文档系统和 npm 工�
 # ========================================
 # 文档与排版工具
 # ========================================
-quarto = "latest"         # 科学文档生成工具
-typst = "latest"          # 现代文档排版系统（类似 LaTeX）
+# 使用 ubi backend 从 GitHub releases 安装
+"ubi:quarto-dev/quarto-cli" = "latest"       # Quarto 科学文档生成工具
+"ubi:typst/typst" = "latest"                 # Typst 现代文档排版系统
 
 # ========================================
 # 多媒体处理
 # ========================================
-ffmpeg = "latest"         # 音频/视频转换和处理
+# 使用 ubi backend 从 GitHub releases 安装
+"ubi:BtbN/FFmpeg-Builds" = "latest"          # FFmpeg 音频/视频转换和处理
 
 # ========================================
 # 数据处理工具
@@ -49,8 +51,8 @@ pixi = "latest"           # 现代 Python/Conda 包管理器
 # ========================================
 # AI CLI 工具（通过 npm 安装）
 # ========================================
-"npm:@anthropics/claude-cli" = "latest"  # Anthropic Claude CLI
-"npm:@google-ai/gemini-cli" = "latest"   # Google Gemini CLI
+"npm:@anthropic-ai/claude-code" = "latest"   # Claude Code CLI (官方)
+"npm:@google/gemini-cli" = "latest"          # Gemini CLI (官方)
 
 # ========================================
 # (可选) 其他语言运行时

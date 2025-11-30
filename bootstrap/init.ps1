@@ -18,7 +18,7 @@ $ErrorActionPreference = "Stop"
 # ========================================
 # 配置
 # ========================================
-$REPO_URL = "https://github.com/用户名/meta-infra.git"  # TODO: 替换
+$REPO_URL = "https://github.com/exusiaiw/meta-infra.git"  # TODO: 替换
 $INSTALL_DIR = Join-Path $env:USERPROFILE "meta-infra"
 
 # ========================================

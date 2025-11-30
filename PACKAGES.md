@@ -102,37 +102,37 @@ Nvidia.GeForceExperience                # NVIDIA GeForce Experience (x86)
 
 ### 语言运行时
 ```
-python = "3.12"                         # Python 3.12 (固定版本)
-node = "lts"                            # Node.js LTS
+python = "3.12"                                # Python 3.12 (固定版本)
+node = "lts"                                   # Node.js LTS
 ```
 
-### 文档与排版
+### 文档与排版 (通过 ubi backend)
 ```
-quarto = "latest"                       # Quarto
-typst = "latest"                        # Typst
+ubi:quarto-dev/quarto-cli = "latest"           # Quarto
+ubi:typst/typst = "latest"                     # Typst
 ```
 
-### 多媒体
+### 多媒体 (通过 ubi backend)
 ```
-ffmpeg = "latest"                       # FFmpeg
+ubi:BtbN/FFmpeg-Builds = "latest"              # FFmpeg
 ```
 
 ### 数据处理
 ```
-jq = "latest"                           # jq (JSON 处理)
-yq = "latest"                           # yq (YAML 处理)
-ripgrep = "latest"                      # ripgrep (搜索)
+jq = "latest"                                   # jq (JSON 处理)
+yq = "latest"                                   # yq (YAML 处理)
+ripgrep = "latest"                              # ripgrep (搜索)
 ```
 
 ### Python 包管理
 ```
-pixi = "latest"                         # Pixi
+pixi = "latest"                                 # Pixi
 ```
 
 ### AI CLI (通过 npm)
 ```
-npm:@anthropics/claude-cli = "latest"   # Claude CLI
-npm:@google-ai/gemini-cli = "latest"    # Gemini CLI
+npm:@anthropic-ai/claude-code = "latest"       # Claude Code CLI (官方)
+npm:@google/gemini-cli = "latest"              # Gemini CLI (官方)
 ```
 
 ---
@@ -145,14 +145,15 @@ npm:@google-ai/gemini-cli = "latest"    # Gemini CLI
 3. 在本文件中添加记录
 
 ### Mise 工具
-1. 检查可用性: `mise plugins ls-remote | grep 工具名`
-2. 在 `mise.toml` 的 `[tools]` 部分添加
-3. 在本文件中添加记录
+1. 检查可用性: `mise registry | grep 工具名`
+2. 或使用 ubi backend: `ubi:owner/repo`
+3. 在 `mise.toml` 的 `[tools]` 部分添加
+4. 在本文件中添加记录
 
 ---
 
 ## 📊 统计
 
 - **Winget GUI 应用**: 37 个
-- **Mise CLI 工具**: 11 个
+- **Mise CLI 工具**: 11 个 (全部通过 Mise 管理)
 - **总计**: 48 个软件包

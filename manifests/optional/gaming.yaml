@@ -2,95 +2,30 @@
 # ================================================================================================
 # meta-infra - Optional: Gaming
 # ================================================================================================
-# 用途：游戏相关工具（平台 + 辅助 + MOD）
-# 优先级：🔵 可选（仅游戏玩家）
-# 适用设备：主力机
-#
-# 安装方式：
-#   winget configure manifests/optional/gaming.yaml
-#
-# 包含工具：
-#   游戏平台：Steam, Battle.net
-#   游戏辅助：MSI Afterburner, RivaTuner Statistics Server
-#   游戏 MOD：红警3日冕启动器, RA3BattleNet, SCNexus 星际枢纽
+# Gaming tools (platforms, utilities)
+# Priority: Optional (gamers only)
 # ================================================================================================
 
+$schema: https://aka.ms/configuration-dsc-schema/0.2
 properties:
+  resources:
+    # === Gaming Platforms ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: steam
+      settings:
+        id: Valve.Steam
+        source: winget
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: battlenet
+      settings:
+        id: Blizzard.BattleNet
+        source: winget
+
+    # === Gaming Utilities ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: msi_afterburner
+      settings:
+        id: Guru3D.Afterburner
+        source: winget
   configurationVersion: 0.2.0
-
-resources:
-  # ========================================
-  # 游戏平台
-  # ========================================
-
-  - resource: Microsoft.WinGet.DSC/WinGetPackage
-    id: steam
-    directives:
-      description: 安装 Steam 游戏平台
-      allowPrerelease: false
-    settings:
-      id: Valve.Steam
-      source: winget
-
-  - resource: Microsoft.WinGet.DSC/WinGetPackage
-    id: battlenet
-    directives:
-      description: 安装 Battle.net（暴雪战网）
-      allowPrerelease: false
-    settings:
-      id: Blizzard.BattleNet
-      source: winget
-
-  # ========================================
-  # 游戏辅助工具
-  # ========================================
-
-  - resource: Microsoft.WinGet.DSC/WinGetPackage
-    id: msi_afterburner
-    directives:
-      description: 安装 MSI Afterburner（显卡超频监控）
-      allowPrerelease: false
-    settings:
-      id: Guru3D.Afterburner
-      source: winget
-
-  # 注意：RivaTuner Statistics Server (RTSS) 通常随 MSI Afterburner 一起安装
-  # 如果需要单独管理，可以添加：
-  # - resource: Microsoft.WinGet.DSC/WinGetPackage
-  #   id: rivatuner
-  #   directives:
-  #     description: 安装 RivaTuner Statistics Server
-  #   settings:
-  #     id: Guru3D.RTSS
-  #     source: winget
-
-  # ========================================
-  # 游戏 MOD 工具（需要确认 Winget ID）
-  # ========================================
-
-  # 红警3日冕启动器
-  # - resource: Microsoft.WinGet.DSC/WinGetPackage
-  #   id: ra3_corona
-  #   directives:
-  #     description: 安装红警3日冕启动器
-  #   settings:
-  #     id: <需要查找>
-  #     source: winget
-
-  # RA3BattleNet
-  # - resource: Microsoft.WinGet.DSC/WinGetPackage
-  #   id: ra3_battlenet
-  #   directives:
-  #     description: 安装 RA3BattleNet
-  #   settings:
-  #     id: <需要查找>
-  #     source: winget
-
-  # SCNexus 星际枢纽
-  # - resource: Microsoft.WinGet.DSC/WinGetPackage
-  #   id: scnexus
-  #   directives:
-  #     description: 安装 SCNexus 星际枢纽
-  #   settings:
-  #     id: <需要查找>
-  #     source: winget

@@ -2,16 +2,16 @@
 # ================================================================================================
 # meta-infra - Standard: AI Tools
 # ================================================================================================
-# 用途：AI 工具
-# 优先级：🟡 推荐
+# AI tools
+# Priority: Recommended
 # ================================================================================================
 
+$schema: https://aka.ms/configuration-dsc-schema/0.2
 properties:
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: cherry_studio
+      settings:
+        id: kangfenmao.CherryStudio
+        source: winget
   configurationVersion: 0.2.0
-
-resources:
-  - resource: Microsoft.WinGet.DSC/WinGetPackage
-    id: cherry_studio
-    settings:
-      id: kangfenmao.CherryStudio
-      source: winget

@@ -10,7 +10,7 @@
 # Design: Minimize PowerShell code, delegate complex logic to Mise + Nushell
 #
 # Usage:
-#   irm https://raw.githubusercontent.com/exusiaiw/meta-infra/main/bootstrap/init.ps1 | iex
+#   irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap/init.ps1 | iex
 # ================================================================================================
 
 #Requires -Version 5.1
@@ -20,7 +20,7 @@ $ErrorActionPreference = "Stop"
 # ========================================
 # Configuration
 # ========================================
-$REPO_URL = "https://github.com/exusiaiw/meta-infra.git"
+$REPO_URL = "https://github.com/exusiaiwei/meta-infra.git"
 $INSTALL_DIR = Join-Path $env:USERPROFILE "meta-infra"
 
 # ========================================

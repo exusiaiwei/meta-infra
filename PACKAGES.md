@@ -27,6 +27,7 @@ RamenSoftware.Windhawk                  # Windhawk
 ArminOsaj.AutoDarkMode                  # Auto Dark Mode
 MacType.MacType                         # MacType
 AmN.yasb                                # yasb
+Bitwarden.Bitwarden                     # Bitwarden (密码管理器)
 Pylogmon.pot                            # Pot (翻译)
 AdGuard.AdGuard                         # AdGuard
 Zen-Team.Zen-Browser                    # Zen Browser
@@ -154,6 +155,6 @@ npm:@google/gemini-cli = "latest"              # Gemini CLI (官方)
 
 ## 📊 统计
 
-- **Winget GUI 应用**: 37 个
+- **Winget GUI 应用**: 38 个
 - **Mise CLI 工具**: 11 个 (全部通过 Mise 管理)
-- **总计**: 48 个软件包
+- **总计**: 49 个软件包

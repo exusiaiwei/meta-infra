@@ -2,41 +2,22 @@
 # ================================================================================================
 # meta-infra - Optional: Cloud Storage
 # ================================================================================================
-# 用途：云存储同步工具
-# 优先级：🔵 可选
-#
-# 安装方式：
-#   winget configure manifests/optional/cloud.yaml
-#
-# 包含工具：
-#   - Microsoft OneDrive: 微软云存储（系统可能已自带，用 Winget 重装以规范化源）
-#   - Google Drive: Google 云存储
+# Cloud storage sync tools
+# Priority: Optional
 # ================================================================================================
 
+$schema: https://aka.ms/configuration-dsc-schema/0.2
 properties:
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: onedrive
+      settings:
+        id: Microsoft.OneDrive
+        source: winget
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: google_drive
+      settings:
+        id: Google.GoogleDrive
+        source: winget
   configurationVersion: 0.2.0
-
-resources:
-  # ========================================
-  # Microsoft OneDrive
-  # ========================================
-  - resource: Microsoft.WinGet.DSC/WinGetPackage
-    id: onedrive
-    directives:
-      description: 安装 Microsoft OneDrive（系统自带也要重装）
-      allowPrerelease: false
-    settings:
-      id: Microsoft.OneDrive
-      source: winget
-
-  # ========================================
-  # Google Drive
-  # ========================================
-  - resource: Microsoft.WinGet.DSC/WinGetPackage
-    id: google_drive
-    directives:
-      description: 安装 Google Drive
-      allowPrerelease: false
-    settings:
-      id: Google.GoogleDrive
-      source: winget

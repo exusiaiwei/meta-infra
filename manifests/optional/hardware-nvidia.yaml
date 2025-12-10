@@ -2,36 +2,17 @@
 # ================================================================================================
 # meta-infra - Optional: NVIDIA Hardware
 # ================================================================================================
-# 用途：NVIDIA 显卡相关工具
-# 优先级：🔵 可选（仅 NVIDIA 显卡用户）
-# 硬件要求：NVIDIA GeForce/RTX 系列显卡
-#
-# 安装方式：
-#   winget configure manifests/optional/hardware-nvidia.yaml
-#
-# ⚠️ 注意：
-#   - 仅适用于 NVIDIA 显卡
-#   - AMD 显卡用户请使用 hardware-amd.yaml
-#   - 安装前请确认您的显卡品牌
+# NVIDIA GPU tools
+# Priority: Optional (NVIDIA GPU users only)
+# WARNING: Only for NVIDIA GeForce/RTX GPUs
 # ================================================================================================
 
+$schema: https://aka.ms/configuration-dsc-schema/0.2
 properties:
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: nvidia_geforce
+      settings:
+        id: Nvidia.GeForceExperience
+        source: winget
   configurationVersion: 0.2.0
-
-resources:
-  # ========================================
-  # NVIDIA App（新版驱动管理工具）
-  # ========================================
-  - resource: Microsoft.WinGet.DSC/WinGetPackage
-    id: nvidia_app
-    directives:
-      description: 安装 NVIDIA App（替代 GeForce Experience）
-      allowPrerelease: false
-    settings:
-      id: Nvidia.GeForceNow
-      source: winget
-    # 注意：NVIDIA App 的 Winget ID 需要确认
-    # 可能是：
-    # - Nvidia.GeForceNow
-    # - Nvidia.GeForceExperience（旧版）
-    # - Nvidia.App（新版，如果有的话）

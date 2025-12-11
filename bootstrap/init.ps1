@@ -78,14 +78,33 @@ function Start-Bootstrap {
     Write-Step "[完成] Git 已就绪" "Green"
 
     # 步骤 2: 克隆/更新仓库
-    if (Test-Path $INSTALL_DIR) {
-        Write-Step "仓库已存在，正在更新..."
+    # 步骤 2: 克隆/更新仓库
+    $gitDir = Join-Path $INSTALL_DIR ".git"
+
+    if (Test-Path $gitDir) {
+        Write-Step "检测到现有仓库，正在同步..."
         Push-Location $INSTALL_DIR
-        git pull
+        try {
+            git pull
+            if ($LASTEXITCODE -ne 0) { throw "Git pull failed" }
+            Write-Step "[完成] 仓库已更新" "Green"
+        } catch {
+            Write-Host "[警告] 同步失败，请手动检查: $INSTALL_DIR" -ForegroundColor Yellow
+        }
         Pop-Location
+    } elseif (Test-Path $INSTALL_DIR) {
+         # 目录存在但不是 Git 仓库
+         Write-Host "[错误] 目标目录已存在但不是 Git 仓库: $INSTALL_DIR" -ForegroundColor Red
+         Write-Host "请手动删除或备份该目录后重试。" -ForegroundColor Yellow
+         exit 1
     } else {
-        Write-Step "正在克隆仓库: $REPO_URL"
+        Write-Step "正在克隆仓库..."
         git clone $REPO_URL $INSTALL_DIR
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "[错误] 克隆失败" -ForegroundColor Red
+            exit 1
+        }
+        Write-Step "[完成] 仓库克隆成功" "Green"
     }
 
     Write-Step "[完成] 仓库已就绪" "Green"

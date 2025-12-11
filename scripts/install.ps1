@@ -17,21 +17,21 @@ function Show-Menu {
     $cursorPos = 0
     $selected = @{}
 
-    [Console]::CursorVisible = $false
+    # Hide cursor
+    try { [Console]::CursorVisible = $false } catch {}
 
-    Write-Host ""
-    Write-Host $Title -ForegroundColor Cyan
-    if ($MultiSelect) {
-        Write-Host "(Up/Down: move, Space: toggle, Enter: confirm)" -ForegroundColor DarkGray
-    } else {
-        Write-Host "(Up/Down: move, Enter: confirm)" -ForegroundColor DarkGray
-    }
-    Write-Host ""
+    while ($true) {
+        # Reduce flickering by clearing only when necessary or using simpler redraw
+        Clear-Host
 
-    $startLine = [Console]::CursorTop
-
-    function Render {
-        [Console]::SetCursorPosition(0, $startLine)
+        Write-Host ""
+        Write-Host $Title -ForegroundColor Cyan
+        if ($MultiSelect) {
+            Write-Host "(Up/Down: move, Space: toggle, Enter: confirm, A: all, N: none)" -ForegroundColor DarkGray
+        } else {
+            Write-Host "(Up/Down: move, Enter: confirm)" -ForegroundColor DarkGray
+        }
+        Write-Host ""
 
         for ($i = 0; $i -lt $Options.Count; $i++) {
             $prefix = if ($i -eq $cursorPos) { ">" } else { " " }
@@ -41,29 +41,30 @@ function Show-Menu {
             }
 
             $line = " $prefix $checkbox $($Options[$i].Name)"
-            $padding = " " * [Math]::Max(0, 55 - $line.Length)
 
             if ($i -eq $cursorPos) {
-                Write-Host "$line$padding" -ForegroundColor Green
+                Write-Host "$line" -ForegroundColor Green
             } else {
-                Write-Host "$line$padding" -ForegroundColor White
+                Write-Host "$line" -ForegroundColor White
             }
         }
-    }
 
-    Render
-
-    while ($true) {
         $key = [Console]::ReadKey($true)
 
         switch ($key.Key) {
-            "UpArrow" { if ($cursorPos -gt 0) { $cursorPos-- } }
-            "DownArrow" { if ($cursorPos -lt $Options.Count - 1) { $cursorPos++ } }
+            "UpArrow" {
+                if ($cursorPos -gt 0) { $cursorPos-- }
+                else { $cursorPos = $Options.Count - 1 }
+            }
+            "DownArrow" {
+                if ($cursorPos -lt $Options.Count - 1) { $cursorPos++ }
+                else { $cursorPos = 0 }
+            }
             "Spacebar" { if ($MultiSelect) { $selected[$cursorPos] = -not $selected[$cursorPos] } }
             "A" { if ($MultiSelect) { for ($i = 0; $i -lt $Options.Count; $i++) { $selected[$i] = $true } } }
             "N" { if ($MultiSelect) { $selected = @{} } }
             "Enter" {
-                [Console]::CursorVisible = $true
+                try { [Console]::CursorVisible = $true } catch {}
                 Write-Host ""
 
                 if ($MultiSelect) {
@@ -77,13 +78,11 @@ function Show-Menu {
                 }
             }
             "Escape" {
-                [Console]::CursorVisible = $true
+                try { [Console]::CursorVisible = $true } catch {}
                 Write-Host ""
                 return $null
             }
         }
-
-        Render
     }
 }
 

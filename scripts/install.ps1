@@ -107,21 +107,29 @@ $ToolsApps = @(
     @{Name="Bitwarden"; Id="Bitwarden.Bitwarden"}
     @{Name="AdGuard"; Id="AdGuard.AdGuard"}
     @{Name="Zen Browser"; Id="Zen-Team.Zen-Browser"}
-    @{Name="FastCopy"; Id="FastCopy.FastCopy"}
-    @{Name="GeekUninstaller"; Id="GeekUninstaller.GeekUninstaller"}
     @{Name="Quicker"; Id="LiErHeXun.Quicker"}
     @{Name="NanaGet"; Id="9PD5F2D90LS5"}
     @{Name="pot (Translator)"; Id="Pylogmon.pot"}
     @{Name="AB Download Manager"; Id="amir1376.ABDownloadManager"}
     @{Name="Winget-AutoUpdate"; Id="Romanitho.Winget-AutoUpdate"}
+)
+
+$PortableApps = @(
+    @{Name="GeekUninstaller"; Id="GeekUninstaller.GeekUninstaller"}
     @{Name="O&O AppBuster"; Id="OO-Software.AppBuster"}
+    @{Name="RoboCopyEx (WinUI)"; Id="9MVWF8R6V6SJ"}
+    @{Name="Everything"; Id="voidtools.Everything"}
+    @{Name="Ditto Clipboard"; Id="Ditto.Ditto"}
+    @{Name="WizTree"; Id="AntibodySoftware.WizTree"}
 )
 
 $UIApps = @(
     @{Name="Mica For Everyone"; Id="MicaForEveryone.MicaForEveryone"}
     @{Name="Lively Wallpaper"; Id="rocksdanister.LivelyWallpaper"}
     @{Name="Dynamic Theme"; Id="9NBLGGH1ZBKW"}
-    @{Name="yasb (Taskbar)"; Id="AmN.yasb"}
+    @{Name="Nilesoft Shell"; Id="Nilesoft.Shell"}
+    @{Name="TranslucentTB"; Id="CharlesMilette.TranslucentTB"}
+    @{Name="Windhawk"; Id="RamenSoftware.Windhawk"}
 )
 
 $DevApps = @(
@@ -230,10 +238,10 @@ switch ($mode.Value) {
         $appsToInstall = $CoreApps
     }
     "standard" {
-        $appsToInstall = $CoreApps + $ToolsApps + $UIApps + $DevApps
+        $appsToInstall = $CoreApps + $ToolsApps + $PortableApps + $UIApps + $DevApps
     }
     "full" {
-        $appsToInstall = $CoreApps + $ToolsApps + $UIApps + $DevApps + $AcademicApps + $AIApps + $MediaApps + $CommApps + $GamingApps + $OfficeApps
+        $appsToInstall = $CoreApps + $ToolsApps + $PortableApps + $UIApps + $DevApps + $AcademicApps + $AIApps + $MediaApps + $CommApps + $GamingApps + $OfficeApps
     }
     "custom" {
         Write-Host ""
@@ -244,7 +252,8 @@ switch ($mode.Value) {
 
         $categories = @(
             @{Name="Core (6)"; Apps=$CoreApps}
-            @{Name="Tools (15)"; Apps=$ToolsApps}
+            @{Name="Tools (12)"; Apps=$ToolsApps}
+            @{Name="Portable (6)"; Apps=$PortableApps}
             @{Name="UI/Theme (4)"; Apps=$UIApps}
             @{Name="Dev (8)"; Apps=$DevApps}
             @{Name="Academic (3)"; Apps=$AcademicApps}

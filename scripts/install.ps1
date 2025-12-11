@@ -176,100 +176,142 @@ $OfficeApps = @(
 # ========================================
 # Install Function
 # ========================================
+# ========================================
+# Install Function
+# ========================================
 function Install-Apps {
     param([array]$Apps)
 
     if ($Apps.Count -eq 0) {
         Write-Host "No apps selected" -ForegroundColor Yellow
-        return
+        Start-Sleep -Seconds 1
+        return $false
     }
 
-    Write-Host ""
-    Write-Host "Apps to install:" -ForegroundColor Cyan
-    foreach ($app in $Apps) {
-        Write-Host "  + $($app.Name)" -ForegroundColor Green
-    }
+    while ($true) {
+        Clear-Host
+        Write-Host ""
+        Write-Host "============================================" -ForegroundColor Cyan
+        Write-Host "  Review Selection" -ForegroundColor Cyan
+        Write-Host "============================================" -ForegroundColor Cyan
+        Write-Host ""
 
-    Write-Host ""
-    $confirm = Read-Host "Confirm? (Y/n)"
+        Write-Host "Selected packages ($($Apps.Count)): " -ForegroundColor Yellow
+        Write-Host ""
 
-    if ($confirm -eq '' -or $confirm -eq 'Y' -or $confirm -eq 'y') {
-        foreach ($app in $Apps) {
-            Write-Host ""
-            Write-Host "Installing: $($app.Name)" -ForegroundColor Cyan
-            winget install $app.Id --accept-package-agreements --accept-source-agreements --disable-interactivity
+        $colCount = 3
+        $rows = [Math]::Ceiling($Apps.Count / $colCount)
+        for ($i = 0; $i -lt $rows; $i++) {
+            $line = ""
+            for ($j = 0; $j -lt $colCount; $j++) {
+                $idx = $i + ($j * $rows)
+                if ($idx -lt $Apps.Count) {
+                    $line += "- {0,-25}" -f $Apps[$idx].Name
+                }
+            }
+            Write-Host $line -ForegroundColor Green
         }
+
         Write-Host ""
-        Write-Host "Done!" -ForegroundColor Green
-    } else {
-        Write-Host "Cancelled" -ForegroundColor Yellow
-    }
-}
-
-# ========================================
-# Main Program
-# ========================================
-Clear-Host
-Write-Host ""
-Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "     meta-infra Interactive Installer" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Cyan
-
-$modes = @(
-    @{Name="Quick    - Core only (6 apps)"; Value="quick"}
-    @{Name="Standard - Core + Tools + UI + Dev (35 apps)"; Value="standard"}
-    @{Name="Full     - All apps (50+ apps)"; Value="full"}
-    @{Name="Custom   - Select by category"; Value="custom"}
-    @{Name="Exit"; Value="exit"}
-)
-
-$mode = Show-Menu -Title "Select installation mode:" -Options $modes
-
-if (-not $mode -or $mode.Value -eq "exit") {
-    Write-Host "Bye!" -ForegroundColor Yellow
-    exit
-}
-
-$appsToInstall = @()
-
-switch ($mode.Value) {
-    "quick" {
-        $appsToInstall = $CoreApps
-    }
-    "standard" {
-        $appsToInstall = $CoreApps + $ToolsApps + $PortableApps + $UIApps + $DevApps
-    }
-    "full" {
-        $appsToInstall = $CoreApps + $ToolsApps + $PortableApps + $UIApps + $DevApps + $AcademicApps + $AIApps + $MediaApps + $CommApps + $GamingApps + $OfficeApps
-    }
-    "custom" {
-        Write-Host ""
-        Write-Host "============================================" -ForegroundColor Cyan
-        Write-Host "  Custom Installation" -ForegroundColor Cyan
-        Write-Host "============================================" -ForegroundColor Cyan
-        Write-Host "(A: select all, N: select none)" -ForegroundColor DarkGray
-
-        $categories = @(
-            @{Name="Core (6)"; Apps=$CoreApps}
-            @{Name="Tools (12)"; Apps=$ToolsApps}
-            @{Name="Portable (6)"; Apps=$PortableApps}
-            @{Name="UI/Theme (4)"; Apps=$UIApps}
-            @{Name="Dev (8)"; Apps=$DevApps}
-            @{Name="Academic (3)"; Apps=$AcademicApps}
-            @{Name="AI (2)"; Apps=$AIApps}
-            @{Name="Media (2)"; Apps=$MediaApps}
-            @{Name="Communication (3)"; Apps=$CommApps}
-            @{Name="Gaming (2)"; Apps=$GamingApps}
-            @{Name="Office (1)"; Apps=$OfficeApps}
+        $confirm = Show-Menu -Title "Ready to install?" -Options @(
+            @{Name="Yes, install now"; Value="yes"}
+            @{Name="No, go back to menu"; Value="back"}
         )
 
-        foreach ($cat in $categories) {
-            $selected = Show-Menu -Title "Select from $($cat.Name):" -Options $cat.Apps -MultiSelect $true
-            if ($selected) {
-                $appsToInstall += $selected
+        if ($confirm.Value -eq "yes") {
+            foreach ($app in $Apps) {
+                Write-Host ""
+                Write-Host "Installing: $($app.Name)" -ForegroundColor Cyan
+                winget install $app.Id --accept-package-agreements --accept-source-agreements --disable-interactivity
+            }
+            Write-Host ""
+            Write-Host "Installation cycle complete!" -ForegroundColor Green
+            Write-Host "Press any key to return to main menu..." -ForegroundColor DarkGray
+            [Console]::ReadKey($true) | Out-Null
+            return $true
+        } else {
+            return $false
+        }
+    }
+}
+
+# ========================================
+# Main Program Loop
+# ========================================
+while ($true) {
+    Clear-Host
+    Write-Host ""
+    Write-Host "============================================" -ForegroundColor Cyan
+    Write-Host "     meta-infra Interactive Installer" -ForegroundColor Cyan
+    Write-Host "============================================" -ForegroundColor Cyan
+
+    $modes = @(
+        @{Name="Quick    - Core only (6 apps)"; Value="quick"}
+        @{Name="Standard - Core + Tools + UI + Dev (35 apps)"; Value="standard"}
+        @{Name="Full     - All apps (50+ apps)"; Value="full"}
+        @{Name="Custom   - Select by category"; Value="custom"}
+        @{Name="Exit"; Value="exit"}
+    )
+
+    $mode = Show-Menu -Title "Select installation mode:" -Options $modes
+
+    if (-not $mode -or $mode.Value -eq "exit") {
+        Write-Host "Bye!" -ForegroundColor Yellow
+        exit
+    }
+
+    $appsToInstall = @()
+    $goBack = $false
+
+    switch ($mode.Value) {
+        "quick" { $appsToInstall = $CoreApps }
+        "standard" { $appsToInstall = $CoreApps + $ToolsApps + $PortableApps + $UIApps + $DevApps }
+        "full" { $appsToInstall = $CoreApps + $ToolsApps + $PortableApps + $UIApps + $DevApps + $AcademicApps + $AIApps + $MediaApps + $CommApps + $GamingApps + $OfficeApps }
+        "custom" {
+            $categories = @(
+                @{Name="Core (6)"; Apps=$CoreApps}
+                @{Name="Tools (12)"; Apps=$ToolsApps}
+                @{Name="Portable (6)"; Apps=$PortableApps}
+                @{Name="UI/Theme (6)"; Apps=$UIApps}
+                @{Name="Dev (8)"; Apps=$DevApps}
+                @{Name="Academic (3)"; Apps=$AcademicApps}
+                @{Name="AI (2)"; Apps=$AIApps}
+                @{Name="Media (2)"; Apps=$MediaApps}
+                @{Name="Communication (3)"; Apps=$CommApps}
+                @{Name="Gaming (2)"; Apps=$GamingApps}
+                @{Name="Office (1)"; Apps=$OfficeApps}
+            )
+
+            # Select categories first to avoid going through all
+            $selectedCats = Show-Menu -Title "Select categories to browse (Space to toggle):" -Options $categories -MultiSelect $true
+
+            if (-not $selectedCats) {
+                $goBack = $true
+            } else {
+                foreach ($cat in $selectedCats) {
+                    if ($goBack) { break }
+
+                    while ($true) {
+                        $selected = Show-Menu -Title "Select from $($cat.Name) (ESC to skip category):" -Options $cat.Apps -MultiSelect $true
+                        if ($selected -eq $null) {
+                             # Esc pressed in category view
+                             $action = Show-Menu -Title "Category skipped. Action?" -Options @(
+                                @{Name="Next Category"; Value="next"}
+                                @{Name="Return to Main Menu"; Value="main"}
+                             )
+                             if ($action.Value -eq "main") { $goBack = $true; break }
+                             if ($action.Value -eq "next") { break }
+                        } else {
+                            $appsToInstall += $selected
+                            break
+                        }
+                    }
+                }
             }
         }
     }
-}
 
-Install-Apps -Apps $appsToInstall
+    if (-not $goBack) {
+        Install-Apps -Apps $appsToInstall
+    }
+}

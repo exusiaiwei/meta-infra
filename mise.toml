@@ -26,15 +26,9 @@ node = "lts"              # Node.js LTS 版本（用于文档系统和 npm 工�
 # ========================================
 # 文档与排版工具
 # ========================================
-# 使用 ubi backend 从 GitHub releases 安装
-"ubi:quarto-dev/quarto-cli" = "latest"       # Quarto 科学文档生成工具
-"ubi:typst/typst" = "latest"                 # Typst 现代文档排版系统
-
-# ========================================
-# 多媒体处理
-# ========================================
-# 使用 ubi backend 从 GitHub releases 安装
-"ubi:BtbN/FFmpeg-Builds" = "latest"          # FFmpeg 音频/视频转换和处理
+# 注意：Quarto、Typst 等复杂工具改用 Winget 安装
+# winget install Posit.Quarto
+# winget install Typst.Typst
 
 # ========================================
 # 数据处理工具

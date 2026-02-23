@@ -2,8 +2,8 @@
 # ================================================================================================
 # meta-infra - Standard: Tools
 # ================================================================================================
-# Efficiency tools (system enhancement, network, browser, utilities)
-# Priority: Recommended
+# 效率工具（系统增强、网络、浏览器、实用工具）
+# 优先级：推荐
 # ================================================================================================
 
 $schema: https://aka.ms/configuration-dsc-schema/0.2
@@ -14,12 +14,6 @@ properties:
       id: powertoys
       settings:
         id: Microsoft.PowerToys
-        source: winget
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: flow_launcher
-      settings:
-        id: FlowLauncher.FlowLauncher
         source: winget
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
@@ -58,17 +52,30 @@ properties:
         id: Bitwarden.Bitwarden
         source: winget
 
-    # === Network & Translation ===
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: pot
+      id: nanazip
       settings:
-        id: Pylogmon.pot
+        id: M2Team.NanaZip
+        source: winget
+
+    # === Network & Proxy ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: clash_verge
+      settings:
+        id: ClashVergeRev.ClashVergeRev
         source: winget
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: adguard
       settings:
         id: AdGuard.AdGuard
+        source: winget
+
+    # === Translation ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: pot
+      settings:
+        id: Pylogmon.pot
         source: winget
 
     # === File Tools ===
@@ -78,23 +85,16 @@ properties:
         id: FastCopy.FastCopy
         source: winget
 
-    # === Browsers ===
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: zen_browser
-      settings:
-        id: Zen-Team.Zen-Browser
-        source: winget
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: edge
-      settings:
-        id: Microsoft.Edge
-        source: winget
-
-    # === Uninstall Tools ===
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: geek_uninstaller
       settings:
         id: GeekUninstaller.GeekUninstaller
+        source: winget
+
+    # === Browser ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: edge
+      settings:
+        id: Microsoft.Edge
         source: winget
   configurationVersion: 0.2.0

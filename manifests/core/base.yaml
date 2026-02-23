@@ -8,13 +8,12 @@
 # 安装方式：
 #   winget configure manifests/core/base.yaml --accept-configuration-agreements
 #
-# 包含工具（6个）：
+# 包含工具（5个）：
 #   - Git: 版本控制
 #   - Mise: 环境与任务管理
-#   - Nushell: 现代化 Shell
+#   - MSYS2: Zsh + Unix 工具链
 #   - Starship: Shell 提示符美化
 #   - Windows Terminal: 终端
-#   - NanaZip: 压缩工具
 # ================================================================================================
 
 $schema: https://aka.ms/configuration-dsc-schema/0.2
@@ -45,15 +44,15 @@ properties:
         source: winget
 
     # ========================================
-    # Nushell - 现代化 Shell
+    # MSYS2 - Zsh + Unix 工具链
     # ========================================
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: nushell
+      id: msys2
       directives:
-        description: Install Nushell (Structured Shell)
+        description: Install MSYS2 (Zsh + Unix Toolchain)
         allowPrerelease: false
       settings:
-        id: Nushell.Nushell
+        id: MSYS2.MSYS2
         source: winget
 
     # ========================================
@@ -78,17 +77,5 @@ properties:
         allowPrerelease: false
       settings:
         id: Microsoft.WindowsTerminal
-        source: winget
-
-    # ========================================
-    # NanaZip - 压缩工具
-    # ========================================
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: nanazip
-      directives:
-        description: Install NanaZip (Modern Archive Tool)
-        allowPrerelease: false
-      settings:
-        id: M2Team.NanaZip
         source: winget
   configurationVersion: 0.2.0

@@ -7,162 +7,175 @@
 #   2. 工具版本管理 (类似 Nvm/Pyenv/Rbenv)
 #   3. 环境变量管理
 #
+# 架构：PowerShell (引导层) → Mise + Zsh (主体层)
 # 文档：https://mise.jdx.dev/
 # ================================================================================================
 
 # ========================================
 # 工具版本管理
 # ========================================
-# 定义项目依赖的工具及其版本
-# 当进入此目录时，Mise 会自动激活这些工具
 
 [tools]
-# ========================================
-# 核心语言运行时
-# ========================================
+# --- 核心语言运行时 ---
 python = "3.12"           # Python 解释器（固定版本，稳定）
-node = "lts"              # Node.js LTS 版本（用于文档系统和 npm 工具）
+node = "lts"              # Node.js LTS 版本
 
-# ========================================
-# 文档与排版工具
-# ========================================
-# 注意：Quarto、Typst 等复杂工具改用 Winget 安装
-# winget install Posit.Quarto
-# winget install Typst.Typst
-
-# ========================================
-# 数据处理工具
-# ========================================
+# --- 数据处理工具 ---
 jq = "latest"             # JSON 查询和处理
 yq = "latest"             # YAML/XML 查询和处理
 ripgrep = "latest"        # 快速文本搜索（rg 命令）
 
-# ========================================
-# Python 包管理
-# ========================================
+# --- Python 包管理 ---
 pixi = "latest"           # 现代 Python/Conda 包管理器
 
-# ========================================
-# AI CLI 工具（通过 npm 安装）
-# ========================================
-"npm:@anthropic-ai/claude-code" = "latest"   # Claude Code CLI (官方)
-"npm:@google/gemini-cli" = "latest"          # Gemini CLI (官方)
+# --- AI CLI 工具（通过 npm 安装）---
+"npm:@anthropic-ai/claude-code" = "latest"   # Claude Code CLI
+"npm:@google/gemini-cli" = "latest"          # Gemini CLI
 
 # ========================================
 # 环境变量
 # ========================================
 [env]
-# 设置项目级别的环境变量
-# PAGER = "cat"           # 禁用分页器
-# EDITOR = "code"         # 设置默认编辑器
+# EDITOR = "code"
 
 # ========================================
-# 核心任务定义
+# 任务定义
 # ========================================
-# 架构设计：
-#   PowerShell (BIOS层) → Mise (OS层) → PowerShell (应用层)
-#   注：已从 Nushell 迁移回 PowerShell 以提高稳定性和兼容性
+# 架构：
+#   PowerShell (引导层 - 裸机唯一可用) → Mise + Zsh (主体层)
+#   init.ps1 只负责: 装 Git + MSYS2 + 克隆仓库
+#   之后所有任务都由 zsh 脚本执行
 
-# ========== Bootstrap 任务 ==========
+# ========== 安装任务 ==========
 
-[tasks.bootstrap]
-description = "【完整安装向导】交互式安装流程 (从 init.ps1 调用)"
-run = "powershell -ExecutionPolicy Bypass -File scripts/install.ps1"
-
-[tasks."bootstrap:quick"]
-description = "【快速安装】仅安装核心+标准层"
+[tasks.install]
+description = "安装所有 Winget 应用（核心 + 标准层）"
 run = """
-winget configure manifests/core/base.yaml --accept-configuration-agreements
-Get-ChildItem manifests/standard/*.yaml | ForEach-Object { winget configure $_.Name --accept-configuration-agreements }
+echo '>> 安装核心层...'
+winget.exe configure manifests/core/base.yaml --accept-configuration-agreements
+echo '>> 安装标准层...'
+for f in manifests/standard/*.yaml; do
+  echo "  安装: $f"
+  winget.exe configure "$f" --accept-configuration-agreements
+done
+echo '✅ 所有应用安装完成'
 """
 
-[tasks."bootstrap:minimal"]
-description = "【最小安装】仅安装核心层"
-run = "winget configure manifests/core/base.yaml --accept-configuration-agreements"
+[tasks."install:core"]
+description = "仅安装核心层"
+run = "winget.exe configure manifests/core/base.yaml --accept-configuration-agreements"
 
-# ========== 初始化任务 ==========
+[tasks."install:optional"]
+description = "安装可选模块（交互式选择）"
+run = """
+echo '可选模块:'
+echo '  1. gaming     - 游戏平台'
+echo '  2. security   - 火绒安全'
+echo '  3. cloud      - 云存储'
+echo '  4. nvidia     - NVIDIA 工具'
+echo '  5. amd        - AMD 工具'
+echo ''
+read 'choice?请输入编号(逗号分隔): '
+for c in ${(s:,:)choice}; do
+  case $c in
+    1) winget.exe configure manifests/optional/gaming.yaml --accept-configuration-agreements ;;
+    2) winget.exe configure manifests/optional/security.yaml --accept-configuration-agreements ;;
+    3) winget.exe configure manifests/optional/cloud.yaml --accept-configuration-agreements ;;
+    4) winget.exe configure manifests/optional/hardware-nvidia.yaml --accept-configuration-agreements ;;
+    5) winget.exe configure manifests/optional/hardware-amd.yaml --accept-configuration-agreements ;;
+  esac
+done
+"""
 
-[tasks.init]
-description = "【阶段 2】初始化所有配置（在 Winget DSC 完成后运行）"
-run = "powershell -ExecutionPolicy Bypass -File scripts/maintenance.ps1 -Task init"
+# ========== 配置任务 ==========
 
-[tasks.verify]
-description = "验证所有依赖工具是否已正确安装"
-run = "powershell -ExecutionPolicy Bypass -File scripts/verify-install.ps1"
+[tasks.setup]
+description = "完整配置向导（Git + Dotfiles + WSL）"
+depends = ["setup:git", "setup:dotfiles"]
+run = """
+echo ''
+echo '是否配置 WSL 环境？'
+read 'reply?[y/N] '
+if [[ "$reply" =~ ^[Yy]$ ]]; then
+  wsl.exe -e bash -c "$(cat scripts/setup-wsl.sh)"
+fi
+echo ''
+echo '✅ 所有配置完成！'
+"""
 
-# ========== 设置任务 ==========
+[tasks."setup:git"]
+description = "配置 Git 用户信息 + 生成 SSH 密钥"
+run = "zsh scripts/setup-git.sh"
 
-[tasks."setup:nushell"]
-description = "配置 Nushell"
-run = "powershell -ExecutionPolicy Bypass -File scripts/setup-config.ps1 -Target nushell"
+[tasks."setup:dotfiles"]
+description = "同步 dotfiles（符号链接）"
+run = "zsh scripts/sync-dotfiles.sh"
 
-[tasks."setup:starship"]
-description = "配置 Starship 提示符"
-run = "powershell -ExecutionPolicy Bypass -File scripts/setup-config.ps1 -Target starship"
-
-[tasks."setup:terminal"]
-description = "配置 Windows Terminal"
-run = "powershell -ExecutionPolicy Bypass -File scripts/setup-config.ps1 -Target terminal"
+[tasks."setup:wsl"]
+description = "一键配置 WSL 环境"
+run = "wsl.exe -e bash -c \"$(cat scripts/setup-wsl.sh)\""
 
 # ========== 维护任务 ==========
 
-[tasks.update]
-description = "更新所有工具和包"
-run = "powershell -ExecutionPolicy Bypass -File scripts/maintenance.ps1 -Task update"
-
 [tasks.status]
-description = "显示系统状态和已安装工具"
-run = "powershell -ExecutionPolicy Bypass -File scripts/maintenance.ps1 -Task status"
-
-[tasks.clean]
-description = "清理临时文件和缓存"
-run = "powershell -ExecutionPolicy Bypass -File scripts/maintenance.ps1 -Task clean"
-
-# ========== 文档任务 ==========
-
-[tasks."docs:init"]
-description = "初始化 Rspress 文档项目"
+description = "显示系统状态"
 run = """
-if (!(Test-Path docs/package.json)) {
-    cd docs
-    npm create rspress@latest
-    cd ..
-    Write-Host "✅ Rspress 初始化完成"
-} else {
-    Write-Host "ℹ️  文档项目已存在"
-}
+echo '============================================'
+echo '  📊 系统状态'
+echo '============================================'
+echo ''
+echo '>> Mise 工具:'
+mise list 2>/dev/null || echo '  (mise 未安装)'
+echo ''
+echo '>> Git:'
+echo "  user.name  = $(git config --global user.name 2>/dev/null || echo '未配置')"
+echo "  user.email = $(git config --global user.email 2>/dev/null || echo '未配置')"
+echo ''
+echo '>> SSH:'
+if [[ -f "$HOME/.ssh/id_ed25519.pub" ]]; then
+  echo '  ✅ 密钥已存在'
+else
+  echo '  ❌ 未生成密钥'
+fi
+echo ''
+echo '>> WSL:'
+wsl.exe --status 2>/dev/null | head -5 || echo '  (WSL 未安装)'
 """
 
-[tasks."docs:dev"]
-description = "启动文档开发服务器"
-run = "cd docs && npm run dev"
-depends = ["docs:install"]
-
-[tasks."docs:build"]
-description = "构建文档静态站点"
-run = "cd docs && npm run build"
-depends = ["docs:install"]
-
-[tasks."docs:install"]
-description = "安装文档项目依赖"
+[tasks.update]
+description = "更新所有工具和包"
 run = """
-if (Test-Path docs/package.json) {
-    cd docs
-    npm install
-    cd ..
-} else {
-    Write-Host "❌ 文档项目未初始化，请先运行: mise run docs:init"
-    exit 1
-}
+echo '>> 更新 Winget 应用...'
+winget.exe upgrade --all --silent 2>/dev/null || true
+echo ''
+echo '>> 更新 Mise 工具...'
+mise upgrade 2>/dev/null || true
+echo ''
+echo '✅ 更新完成'
+"""
+
+[tasks.verify]
+description = "验证所有依赖工具是否已正确安装"
+run = """
+echo '============================================'
+echo '  🔍 安装验证'
+echo '============================================'
+echo ''
+tools=("git" "mise" "zsh" "starship" "python3" "node" "pixi" "rg" "jq" "yq")
+for tool in $tools; do
+  if command -v $tool &>/dev/null; then
+    version=$($tool --version 2>/dev/null | head -1)
+    echo "  ✅ $tool: $version"
+  else
+    echo "  ❌ $tool: 未安装"
+  fi
+done
 """
 
 # ========================================
 # 任务别名
 # ========================================
 [alias]
-# 常用任务的简短别名
-i = "init"
 s = "status"
 u = "update"
-c = "clean"
 v = "verify"

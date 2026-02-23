@@ -2,8 +2,8 @@
 # ================================================================================================
 # meta-infra - Standard: Academic
 # ================================================================================================
-# Academic tools (notes, bibliography, Office)
-# Priority: Recommended (mainly for Surface Pro X)
+# 学术工具（笔记、文献管理）
+# 优先级：推荐
 # ================================================================================================
 
 $schema: https://aka.ms/configuration-dsc-schema/0.2
@@ -14,12 +14,6 @@ properties:
       id: obsidian
       settings:
         id: Obsidian.Obsidian
-        source: winget
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: anki
-      settings:
-        id: Anki.Anki
         source: winget
 
     # === Bibliography Management ===

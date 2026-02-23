@@ -6,155 +6,102 @@
 
 ## 🔴 Winget 应用 (GUI)
 
-### Core - 核心层 (必装)
-```
-Git.Git                                 # Git
-jdx.mise                                # Mise
-Nushell.Nushell                         # Nushell
-Starship.Starship                       # Starship
-Microsoft.WindowsTerminal               # Windows Terminal
-M2Team.NanaZip                          # NanaZip (7-Zip 替代)
-```
+### Core — 核心层 (必装)
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| Git | `Git.Git` | 版本控制 |
+| Mise | `jdx.mise` | 环境与任务管理 |
+| MSYS2 | `MSYS2.MSYS2` | Zsh + Unix 工具链 |
+| Starship | `Starship.Starship` | Shell 提示符美化 |
+| Windows Terminal | `Microsoft.WindowsTerminal` | 终端 |
 
-### Standard - 标准层 (推荐)
+### Standard — 标准层 (推荐)
 
-#### Tools - 效率工具
-```
-Microsoft.PowerToys                     # PowerToys
-FlowLauncher.FlowLauncher               # Flow Launcher
-49306atecsolution.FilesUWP              # Files App
-RamenSoftware.Windhawk                  # Windhawk
-ArminOsaj.AutoDarkMode                  # Auto Dark Mode
-MacType.MacType                         # MacType
-AmN.yasb                                # yasb
-Bitwarden.Bitwarden                     # Bitwarden (密码管理器)
-Pylogmon.pot                            # Pot (翻译)
-AdGuard.AdGuard                         # AdGuard
-Zen-Team.Zen-Browser                    # Zen Browser
-Microsoft.Edge                          # Microsoft Edge
-FastCopy.FastCopy                       # FastCopy
-GeekUninstaller.GeekUninstaller         # Geek Uninstaller
-```
+#### Tools — 效率工具
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| PowerToys | `Microsoft.PowerToys` | 系统增强 (含 Command Palette) |
+| Files App | `49306atecsolution.FilesUWP` | 现代文件管理器 |
+| Windhawk | `RamenSoftware.Windhawk` | 系统定制 |
+| Auto Dark Mode | `ArminOsaj.AutoDarkMode` | 自动暗色模式 |
+| MacType | `MacType.MacType` | 字体渲染优化 |
+| yasb | `AmN.yasb` | 状态栏 |
+| Bitwarden | `Bitwarden.Bitwarden` | 密码管理器 |
+| NanaZip | `M2Team.NanaZip` | 压缩工具 |
+| Clash Verge | `ClashVergeRev.ClashVergeRev` | 代理客户端 |
+| AdGuard | `AdGuard.AdGuard` | 广告拦截 |
+| Pot | `Pylogmon.pot` | 翻译 |
+| FastCopy | `FastCopy.FastCopy` | 快速复制 |
+| Geek Uninstaller | `GeekUninstaller.GeekUninstaller` | 卸载工具 |
+| Microsoft Edge | `Microsoft.Edge` | 浏览器 |
 
-#### Dev - 开发环境
-```
-Microsoft.VisualStudioCode              # VS Code
-Anysphere.Cursor                        # Cursor
-Google.Antigravity                      # Antigravity (Google AI 助手)
-Microsoft.VisualStudio.2022.BuildTools  # VS Build Tools 2022
-Docker.DockerDesktop                    # Docker Desktop
-GitHub.cli                              # GitHub CLI
-```
+#### Dev — 开发环境
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| VS Code | `Microsoft.VisualStudioCode` | 代码编辑器 |
+| Cursor | `Anysphere.Cursor` | AI 代码编辑器 |
+| VS Build Tools | `Microsoft.VisualStudio.2022.BuildTools` | C++ 编译环境 |
+| Docker Desktop | `Docker.DockerDesktop` | 容器 |
+| GitHub CLI | `GitHub.cli` | GitHub 命令行 |
 
-#### Academic - 学术工具
-```
-Obsidian.Obsidian                       # Obsidian
-Anki.Anki                               # Anki
-DigitalScholar.Zotero                   # Zotero
-Microsoft.Office                        # Microsoft 365
-```
+#### Academic — 学术工具
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| Obsidian | `Obsidian.Obsidian` | 笔记 |
+| Zotero | `DigitalScholar.Zotero` | 文献管理 |
 
-#### AI - AI 工具
-```
-kangfenmao.CherryStudio                 # Cherry Studio
-```
+#### AI — AI 工具
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| Cherry Studio | `kangfenmao.CherryStudio` | AI 客户端 |
 
-#### Media - 多媒体
-```
-Daum.PotPlayer                          # PotPlayer
-AdrienAllard.FileConverter              # File Converter
-```
+#### Media — 多媒体
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| PotPlayer | `Daum.PotPlayer` | 视频播放 |
+| File Converter | `AdrienAllard.FileConverter` | 格式转换 |
 
-#### Communication - 通讯
-```
-Tencent.WeChat                          # 微信
-Tencent.QQ.NT                           # QQ (NT 架构)
-Microsoft.Teams                         # Microsoft Teams
-```
+#### Communication — 通讯
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| 微信 | `Tencent.WeChat` | 微信 |
+| QQ | `Tencent.QQ.NT` | QQ (NT 架构) |
+| Microsoft Teams | `Microsoft.Teams` | Teams |
 
-### Optional - 可选层 (按需)
+### Optional — 可选层 (按需)
 
-#### Gaming - 游戏
-```
-Valve.Steam                             # Steam
-Blizzard.BattleNet                      # Battle.net
-Guru3D.Afterburner                      # MSI Afterburner
-```
+#### Gaming
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| Steam | `Valve.Steam` | 游戏平台 |
+| Battle.net | `Blizzard.BattleNet` | 暴雪战网 |
+| MSI Afterburner | `Guru3D.Afterburner` | 显卡监控 |
 
-#### Security - 安全
-```
-XPDNH1FMW7NB40                          # 火绒 (Microsoft Store)
-```
-
-#### Cloud - 云存储
-```
-Microsoft.OneDrive                      # OneDrive
-Google.GoogleDrive                      # Google Drive
-```
-
-#### Hardware - 硬件工具
-```
-Nvidia.GeForceExperience                # NVIDIA GeForce Experience (x86)
-```
+#### Cloud
+| 软件 | Winget ID | 用途 |
+|------|-----------|------|
+| OneDrive | `Microsoft.OneDrive` | 云存储 |
+| Google Drive | `Google.GoogleDrive` | 云存储 |
 
 ---
 
 ## 🟢 Mise CLI 工具
 
-### 语言运行时
-```
-python = "3.12"                                # Python 3.12 (固定版本)
-node = "lts"                                   # Node.js LTS
-```
-
-### 文档与排版 (通过 ubi backend)
-```
-ubi:quarto-dev/quarto-cli = "latest"           # Quarto
-ubi:typst/typst = "latest"                     # Typst
-```
-
-### 多媒体 (通过 ubi backend)
-```
-ubi:BtbN/FFmpeg-Builds = "latest"              # FFmpeg
-```
-
-### 数据处理
-```
-jq = "latest"                                   # jq (JSON 处理)
-yq = "latest"                                   # yq (YAML 处理)
-ripgrep = "latest"                              # ripgrep (搜索)
-```
-
-### Python 包管理
-```
-pixi = "latest"                                 # Pixi
-```
-
-### AI CLI (通过 npm)
-```
-npm:@anthropic-ai/claude-code = "latest"       # Claude Code CLI (官方)
-npm:@google/gemini-cli = "latest"              # Gemini CLI (官方)
-```
-
----
-
-## 📝 添加新软件
-
-### Winget 应用
-1. 找到 Winget ID: `winget search 软件名`
-2. 添加到对应的 `manifests/*/**.yaml` 文件
-3. 在本文件中添加记录
-
-### Mise 工具
-1. 检查可用性: `mise registry | grep 工具名`
-2. 或使用 ubi backend: `ubi:owner/repo`
-3. 在 `mise.toml` 的 `[tools]` 部分添加
-4. 在本文件中添加记录
+| 工具 | 配置 | 用途 |
+|------|------|------|
+| Python | `python = "3.12"` | Python 解释器 |
+| Node.js | `node = "lts"` | Node.js 运行时 |
+| jq | `jq = "latest"` | JSON 处理 |
+| yq | `yq = "latest"` | YAML 处理 |
+| ripgrep | `ripgrep = "latest"` | 快速搜索 |
+| Pixi | `pixi = "latest"` | Python/Conda 包管理 |
+| Claude Code | `npm:@anthropic-ai/claude-code` | AI CLI |
+| Gemini CLI | `npm:@google/gemini-cli` | AI CLI |
 
 ---
 
 ## 📊 统计
 
-- **Winget GUI 应用**: 38 个
-- **Mise CLI 工具**: 11 个 (全部通过 Mise 管理)
-- **总计**: 49 个软件包
+- **Winget GUI 应用**: ~30 个
+- **Mise CLI 工具**: 8 个
+- **总计**: ~38 个软件包

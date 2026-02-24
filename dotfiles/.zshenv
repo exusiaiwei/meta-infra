@@ -7,7 +7,11 @@
 # MSYS2 默认 HOME=/home/<user>，但我们的文件都在 Windows 用户目录下
 # 将 HOME 重定向到 /c/Users/<user>，使 ~ 路径一致
 if [[ -d "/c/Users" ]] && [[ "$HOME" == /home/* ]]; then
-  export HOME="/c/Users/$(whoami)"
+  _user="${USERNAME:-$(basename "$HOME")}"
+  if [[ -d "/c/Users/$_user" ]]; then
+    export HOME="/c/Users/$_user"
+  fi
+  unset _user
 fi
 
 # MSYS2 工具链

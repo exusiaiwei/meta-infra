@@ -72,7 +72,7 @@ echo ">> Starship 配置:"
 
 if [[ "$ENV" == "msys2" ]]; then
   # Windows: Starship 配置在 %USERPROFILE%/.config/starship.toml
-  WIN_HOME="/c/Users/$(whoami)"
+  WIN_HOME="/c/Users/${USERNAME:-$(whoami)}"
   mkdir -p "$WIN_HOME/.config"
   link_file "$DOTFILES_DIR/starship.toml" "$WIN_HOME/.config/starship.toml"
 else
@@ -92,19 +92,15 @@ fi
 if [[ "$ENV" == "msys2" ]]; then
   echo ""
   echo ">> OneDrive 云盘链接:"
-  WIN_HOME="/c/Users/$(whoami)"
+  WIN_HOME="/c/Users/${USERNAME:-$(whoami)}"
   META_DIR="$WIN_HOME/_Meta"
   CLOUD_LINK="$META_DIR/99_Cloud"
 
   # 自动检测 OneDrive 文件夹（个人版 / 企业版名称不同）
   ONEDRIVE_DIR=""
-  for candidate in \
-    "$WIN_HOME/OneDrive - MSFT"/* \
-    "$WIN_HOME/OneDrive"/* \
-    "$WIN_HOME/OneDrive - Personal"/*; do
-    parent="$(dirname "$candidate")"
-    if [[ -d "$parent" ]]; then
-      ONEDRIVE_DIR="$parent"
+  for candidate in "$WIN_HOME/OneDrive - MSFT" "$WIN_HOME/OneDrive" "$WIN_HOME/OneDrive - Personal"; do
+    if [[ -d "$candidate" ]]; then
+      ONEDRIVE_DIR="$candidate"
       break
     fi
   done

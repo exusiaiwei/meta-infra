@@ -75,6 +75,11 @@ if ! command -v mise &>/dev/null; then
   curl https://mise.run | sh
 fi
 
+# 信任 Windows 侧的 mise.toml 避免报错
+if [ -f "$PWD/mise.toml" ]; then
+  ~/.local/bin/mise trust "$PWD/mise.toml" 2>/dev/null || true
+fi
+
 # ---------- 配置 .zshrc ----------
 ZSHRC="$HOME/.zshrc"
 

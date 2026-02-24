@@ -14,9 +14,23 @@
 
 ---
 
-## ⚡ 快速开始
+## ⚡ 裸机速查（从 GitHub 网页直接复制）
 
-### 一键安装（全自动）
+> 以下命令均在 **管理员 PowerShell** 中运行
+
+### 0. 系统激活
+
+```powershell
+irm https://get.activated.win | iex
+```
+
+### 1. 系统精调（去广告 / 去遥测 / 关 Copilot）
+
+```powershell
+irm https://christitus.com/win | iex
+```
+
+### 2. meta-infra 一键配置
 
 ```powershell
 irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap/init.ps1 | iex
@@ -24,17 +38,27 @@ irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap/ini
 
 这一条命令会自动完成：
 1. ✅ 安装核心工具（Git, MSYS2, Mise, Starship, Windows Terminal）
-2. ✅ 克隆仓库
-3. ✅ 自动切到 zsh 安装所有 CLI 工具 + GUI 应用
-4. ✅ 同步 Dotfiles
+2. ✅ 克隆仓库（失败时提示手动下载 ZIP）
+3. ✅ 安装 Zsh 插件 + CLI 工具 + GUI 应用
+4. ✅ 同步 Dotfiles + 配置 WSL
 
-**全程无需手动切换 shell。** 完成后只需手动配置：
+### 3. 手动收尾
 
 ```bash
 cd ~/_Meta/meta-infra
-mise run setup:git   # Git 用户信息 + SSH 密钥（需要交互输入）
-mise run setup:wsl   # WSL 环境配置（可选）
+mise run setup:git   # Git 用户信息 + SSH 密钥
+mise run setup:wsl   # WSL 环境（可选）
 ```
+
+### 离线 / 无法访问 GitHub？
+
+手动下载 ZIP 并解压到 `C:\Users\你的用户名\_Meta\meta-infra\`：
+
+```
+https://github.com/exusiaiwei/meta-infra/archive/refs/heads/master.zip
+```
+
+解压后运行 `.\bootstrap\init.ps1` 即可继续。
 
 ---
 

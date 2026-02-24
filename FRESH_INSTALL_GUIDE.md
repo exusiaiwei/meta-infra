@@ -80,9 +80,15 @@ Settings → Accounts → Your info → Sign in with a Microsoft account instead
 
 ## 阶段 4：系统激活
 
-联网后激活 Windows 11 Pro。
+以**管理员身份**打开 PowerShell：
 
-验证激活状态：
+```powershell
+irm https://get.activated.win | iex
+```
+
+选择 **HWID** 方式 → 绑定硬件，重装后自动激活。
+
+验证：
 ```
 Settings → System → Activation
 → 应显示「Windows is activated with a digital license」

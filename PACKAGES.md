@@ -21,6 +21,7 @@
 | 软件 | Winget ID | 用途 |
 |------|-----------|------|
 | PowerToys | `Microsoft.PowerToys` | 系统增强 (含 Command Palette) |
+| Winget-AutoUpdate | `Romanitho.Winget-AutoUpdate` | 后台静默自动升级 |
 | Files App | `49306atecsolution.FilesUWP` | 现代文件管理器 |
 | Windhawk | `RamenSoftware.Windhawk` | 系统定制 |
 | Auto Dark Mode | `ArminOsaj.AutoDarkMode` | 自动暗色模式 |

@@ -17,6 +17,12 @@ properties:
         source: winget
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: winget_autoupdate
+      settings:
+        id: Romanitho.Winget-AutoUpdate
+        source: winget
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: files_app
       settings:
         id: 49306atecsolution.FilesUWP

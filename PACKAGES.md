@@ -35,6 +35,7 @@
 | FastCopy | `FastCopy.FastCopy` | 快速复制 |
 | Geek Uninstaller | `GeekUninstaller.GeekUninstaller` | 卸载工具 |
 | Microsoft Edge | `Microsoft.Edge` | 浏览器 |
+| AB Download Manager | `amir1376.ABDownloadManager` | 下载管理器 |
 
 #### Dev — 开发环境
 | 软件 | Winget ID | 用途 |

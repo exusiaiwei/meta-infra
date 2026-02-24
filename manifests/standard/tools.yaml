@@ -103,4 +103,11 @@ properties:
       settings:
         id: Microsoft.Edge
         source: winget
+
+    # === Download ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: ab_download_manager
+      settings:
+        id: amir1376.ABDownloadManager
+        source: winget
   configurationVersion: 0.2.0

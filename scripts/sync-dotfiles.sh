@@ -88,6 +88,49 @@ if [[ -f "$DOTFILES_DIR/.gitconfig" ]]; then
   link_file "$DOTFILES_DIR/.gitconfig" "$TARGET_HOME/.gitconfig"
 fi
 
+# ---------- OneDrive 云盘链接 (仅 MSYS2/Windows) ----------
+if [[ "$ENV" == "msys2" ]]; then
+  echo ""
+  echo ">> OneDrive 云盘链接:"
+  WIN_HOME="/c/Users/$(whoami)"
+  META_DIR="$WIN_HOME/_Meta"
+  CLOUD_LINK="$META_DIR/99_Cloud"
+
+  # 自动检测 OneDrive 文件夹（个人版 / 企业版名称不同）
+  ONEDRIVE_DIR=""
+  for candidate in \
+    "$WIN_HOME/OneDrive - MSFT"/* \
+    "$WIN_HOME/OneDrive"/* \
+    "$WIN_HOME/OneDrive - Personal"/*; do
+    parent="$(dirname "$candidate")"
+    if [[ -d "$parent" ]]; then
+      ONEDRIVE_DIR="$parent"
+      break
+    fi
+  done
+
+  if [[ -n "$ONEDRIVE_DIR" ]]; then
+    # 查找 OneDrive 下的同步文件夹（优先找 Exusiai_Ark，否则用根目录）
+    if [[ -d "$ONEDRIVE_DIR/Exusiai_Ark" ]]; then
+      CLOUD_TARGET="$ONEDRIVE_DIR/Exusiai_Ark"
+    else
+      CLOUD_TARGET="$ONEDRIVE_DIR"
+    fi
+
+    mkdir -p "$META_DIR"
+    if [[ -L "$CLOUD_LINK" ]]; then
+      echo "  ✓ 99_Cloud (已链接)"
+    elif [[ -d "$CLOUD_LINK" ]]; then
+      echo "  ⚠ 99_Cloud 是真实目录，跳过"
+    else
+      ln -sf "$CLOUD_TARGET" "$CLOUD_LINK"
+      echo "  + 99_Cloud → $CLOUD_TARGET"
+    fi
+  else
+    echo "  ⚠ 未检测到 OneDrive 文件夹，跳过"
+  fi
+fi
+
 echo ""
 echo "============================================"
 echo "  ✅ Dotfiles 同步完成"

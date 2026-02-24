@@ -117,6 +117,18 @@ function Start-Bootstrap {
     }
     Write-Step "Windows Terminal ✓" "Green"
 
+    # Clash Verge Rev（代理，后续下载加速）
+    if (-not (Get-Command "clash-verge" -ErrorAction SilentlyContinue)) {
+        Install-WingetPackage "ClashVergeRev.ClashVergeRev" "Clash Verge Rev (代理)"
+    }
+    Write-Step "Clash Verge ✓" "Green"
+
+    Write-Host ""
+    Write-Host "  💡 建议：打开 Clash Verge，导入订阅并开启系统代理" -ForegroundColor Yellow
+    Write-Host "     后续下载速度会显著提升" -ForegroundColor DarkGray
+    Write-Host ""
+    Read-Host "  配置好代理后按 Enter 继续（或直接按 Enter 跳过）"
+
     Write-Host ""
 
     # ---- 阶段 2: 系统精调（可选）----

@@ -226,6 +226,12 @@ meta-infra/
 
 ---
 
+## 📋 TODO
+
+- [ ] **跨设备配置文件同步** — 维护应用配置路径注册表（`app-paths.yaml`），通过 OneDrive + 符号链接自动同步 Windows Terminal / Antigravity / Clash Verge / PowerToys 等配置（类似 macOS 的 Mackup）
+
+---
+
 ## 📄 许可证
 
 MIT License — 详见 [LICENSE](./LICENSE)

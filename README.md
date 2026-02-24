@@ -136,17 +136,22 @@ mise run setup:dotfiles  # 同步配置文件
 
 TUN 模式会劫持所有网络流量，导致 WSL2 无法联网。解决方案：
 
-**方法 1：排除 WSL 网卡（推荐）**
+**方法 1：排除本地子网（推荐）**
 
 Clash Verge → 设置 → Clash 字段 → 覆写 → 添加：
 
 ```yaml
 tun:
+  enable: true
+  stack: mixed
+  dns-hijack:
+    - any:53
   auto-route: true
   strict-route: false
-  exclude-interface:
-    - "vEthernet (WSL)"
-    - "vEthernet (WSL (Hyper-V firewall))"
+  inet4-route-exclude-address:
+    - 127.0.0.0/8      # 本机回环
+    - 172.16.0.0/12     # WSL / Docker 虚拟网络
+    - 192.168.0.0/16    # 局域网
 ```
 
 **方法 2：不用 TUN，改用系统代理**

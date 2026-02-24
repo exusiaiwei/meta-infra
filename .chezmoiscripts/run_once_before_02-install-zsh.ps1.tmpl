@@ -1,6 +1,6 @@
 {{ if eq .chezmoi.os "windows" -}}
 # =============================================================================
-# 02 - Install Zsh + Plugins + Configure MSYS2 HOME
+# 02 - Install Zsh + Plugins + Ensure dotfiles reachable
 # =============================================================================
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -9,29 +9,34 @@ $ErrorActionPreference = "Continue"
 $BASH_EXE = "C:\msys64\usr\bin\bash.exe"
 
 if (Test-Path $BASH_EXE) {
-    Write-Host ">> Configuring MSYS2..." -ForegroundColor Cyan
     $env:MSYSTEM = "MSYS"
     $env:CHERE_INVOKING = "1"
 
-    # CRITICAL: Set MSYS2 HOME to Windows user profile
-    & $BASH_EXE -lc "grep -q 'db_home.*windows' /etc/nsswitch.conf 2>/dev/null || sed -i 's/^db_home:.*/db_home: windows/' /etc/nsswitch.conf 2>/dev/null || echo 'db_home: windows' >> /etc/nsswitch.conf"
-    Write-Host "   OK MSYS2 HOME -> Windows user profile" -ForegroundColor Green
+    # ---- Fix MSYS2 HOME ----
+    # Method 1: nsswitch.conf (db_home: windows)
+    Write-Host ">> Configuring MSYS2 HOME..." -ForegroundColor Cyan
+    & $BASH_EXE -lc "sed -i 's/^db_home:.*/db_home: windows/' /etc/nsswitch.conf"
+    Write-Host "   OK nsswitch.conf updated" -ForegroundColor Green
 
-    # Configure Chinese mirror (default mirror.msys2.org may timeout in China)
+    # Method 2: Symlink fallback
+    # Even if nsswitch.conf doesn't work, symlinks ensure zsh finds dotfiles
+    $winHome = $env:USERPROFILE
+    $username = $env:USERNAME
+    & $BASH_EXE -lc "MSYS_HOME=/home/$username; WIN_HOME=/c/Users/$username; for f in .zshenv .zshrc; do if [ -f `"`$WIN_HOME/`$f`" ] && [ ! -f `"`$MSYS_HOME/`$f`" ]; then ln -sf `"`$WIN_HOME/`$f`" `"`$MSYS_HOME/`$f`"; echo `"   + symlink: `$MSYS_HOME/`$f -> `$WIN_HOME/`$f`"; fi; done; mkdir -p `$MSYS_HOME/.config; if [ -f `"`$WIN_HOME/.config/starship.toml`" ] && [ ! -f `"`$MSYS_HOME/.config/starship.toml`" ]; then ln -sf `"`$WIN_HOME/.config/starship.toml`" `"`$MSYS_HOME/.config/starship.toml`"; echo `"   + symlink: starship.toml`"; fi"
+    Write-Host "   OK dotfiles symlinks ensured" -ForegroundColor Green
+
+    # ---- Pacman mirror (USTC for China) ----
     Write-Host ">> Configuring pacman mirror (USTC)..." -ForegroundColor Cyan
-    & $BASH_EXE -lc @"
-sed -i 's|^Server = https://mirror.msys2.org/|#Server = https://mirror.msys2.org/|g' /etc/pacman.d/mirrorlist.msys 2>/dev/null
-grep -q 'mirrors.ustc.edu.cn' /etc/pacman.d/mirrorlist.msys 2>/dev/null || sed -i '1s|^|Server = https://mirrors.ustc.edu.cn/msys2/msys/\$arch\n|' /etc/pacman.d/mirrorlist.msys 2>/dev/null
-"@
-    Write-Host "   OK pacman mirror set to USTC" -ForegroundColor Green
+    & $BASH_EXE -lc "if ! grep -q 'mirrors.ustc.edu.cn' /etc/pacman.d/mirrorlist.msys 2>/dev/null; then sed -i '1s|^|Server = https://mirrors.ustc.edu.cn/msys2/msys/\$arch\n|' /etc/pacman.d/mirrorlist.msys; fi"
+    Write-Host "   OK pacman mirror" -ForegroundColor Green
 
-    # Update pacman database + install
+    # ---- Install zsh + plugins ----
     Write-Host ">> Installing zsh + plugins..." -ForegroundColor Cyan
     & $BASH_EXE -lc "pacman -Sy --noconfirm 2>&1 && pacman -S --noconfirm --needed zsh zsh-syntax-highlighting zsh-autosuggestions 2>&1"
     if ($LASTEXITCODE -eq 0) {
         Write-Host "   OK zsh + plugins ready" -ForegroundColor Green
     } else {
-        Write-Host "   WARN pacman install may have issues (exit: $LASTEXITCODE)" -ForegroundColor Yellow
+        Write-Host "   WARN pacman may have issues (exit: $LASTEXITCODE)" -ForegroundColor Yellow
     }
 } else {
     Write-Host "   WARN MSYS2 not found, skipping" -ForegroundColor Yellow

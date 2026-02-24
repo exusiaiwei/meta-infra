@@ -46,3 +46,11 @@ Get-Content "$env:USERPROFILE\.ssh\id_ed25519.pub"
 ```
 
 GitHub 添加地址：https://github.com/settings/keys
+
+---
+
+## 诊断（zsh，排查问题用）
+
+```bash
+echo "HOME=$HOME" && which mise && which starship && ls -la ~/.zshenv ~/.zshrc
+```

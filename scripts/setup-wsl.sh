@@ -2,21 +2,30 @@
 # =============================================================================
 # setup-wsl.sh — WSL 一键配置
 # =============================================================================
-# 从 Windows 侧调用: wsl.exe -e bash -c "$(cat scripts/setup-wsl.sh)"
-# 或者在 WSL 内直接运行
+# 可以从 MSYS2 zsh 或 WSL 内直接运行
+# 从 MSYS2 调用时会自动通过 wsl.exe 跳转
 # =============================================================================
-set -euo pipefail
 
 echo "============================================"
 echo "  🐧 WSL 环境配置"
 echo "============================================"
 echo ""
 
-# ---------- 检测是否在 WSL 内 ----------
+# ---------- 检测环境，自动跳转到 WSL ----------
 if ! grep -qi microsoft /proc/version 2>/dev/null; then
-  echo "❌ 此脚本需要在 WSL 内运行"
-  echo "请先运行: wsl.exe"
-  exit 1
+  # 不在 WSL 里，尝试通过 wsl.exe 调用
+  if command -v wsl.exe &>/dev/null; then
+    echo "  检测到 MSYS2 环境，通过 wsl.exe 执行..."
+    # WSL 可以通过 /mnt/c/ 访问 Windows 文件
+    SCRIPT_WIN=$(cygpath -w "${0:a}" 2>/dev/null || echo "$0")
+    SCRIPT_WSL=$(echo "$SCRIPT_WIN" | sed 's|\\|/|g; s|^\([A-Za-z]\):|/mnt/\L\1|')
+    wsl.exe -e bash "$SCRIPT_WSL"
+    exit $?
+  else
+    echo "❌ 未检测到 WSL，请先安装 WSL"
+    echo "  wsl --install"
+    exit 1
+  fi
 fi
 
 # ---------- 系统更新 ----------

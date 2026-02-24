@@ -21,7 +21,7 @@
 ### 第一行：基础环境（全自动）
 
 ```powershell
-irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap.ps1 | iex
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap.ps1 | iex
 ```
 
 这一条命令会自动完成：

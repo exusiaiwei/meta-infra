@@ -137,8 +137,8 @@ function Start-Bootstrap {
     Write-Host "  推荐在新装系统上运行，去除广告、遥测、Copilot 等" -ForegroundColor DarkGray
     Write-Host "  工具: Chris Titus Tech's winutil (开源社区标准工具)" -ForegroundColor DarkGray
     Write-Host ""
-    $tweakChoice = Read-Host "  是否运行系统精调？[Y/n]"
-    if ($tweakChoice -ne "n" -and $tweakChoice -ne "N") {
+    $tweakChoice = Read-Host "  是否运行系统精调？[y/N]"
+    if ($tweakChoice -eq "y" -or $tweakChoice -eq "Y") {
         Write-Step "启动 winutil..."
         try {
             Invoke-RestMethod https://christitus.com/win | Invoke-Expression

@@ -96,7 +96,7 @@ https://github.com/exusiaiwei/meta-infra/archive/refs/heads/master.zip
 - **Windows Terminal** — 终端
 
 ### 标准层 (Standard) — 推荐
-- **tools** — PowerToys, Bitwarden, Clash Verge, AdGuard, NanaZip, FastCopy...
+- **tools** — PowerToys, Bitwarden, Clash Verge, Tailscale, NanaZip, FastCopy...
 - **dev** — VS Code, Cursor, Docker, GitHub CLI
 - **academic** — Obsidian, Zotero
 - **media** — PotPlayer, File Converter

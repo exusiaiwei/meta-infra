@@ -30,7 +30,6 @@
 | Bitwarden | `Bitwarden.Bitwarden` | 密码管理器 |
 | NanaZip | `M2Team.NanaZip` | 压缩工具 |
 | Clash Verge | `ClashVergeRev.ClashVergeRev` | 代理客户端 |
-| AdGuard | `AdGuard.AdGuard` | 广告拦截 |
 | Pot | `Pylogmon.pot` | 翻译 |
 | Tailscale | `Tailscale.Tailscale` | 设备互联 VPN |
 | FastCopy | `FastCopy.FastCopy` | 快速复制 |

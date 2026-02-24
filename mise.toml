@@ -32,8 +32,8 @@ pixi = "latest"           # 现代 Python/Conda 包管理器
 "npm:@anthropic-ai/claude-code" = "latest"   # Claude Code CLI
 "npm:@google/gemini-cli" = "latest"          # Gemini CLI
 
-# --- 文档与排版（通过 ubi backend，从 GitHub releases 安装）---
-"ubi:typst/typst" = "latest"                 # Typst 排版系统
+# --- 文档与排版（通过 github backend，从 GitHub releases 安装）---
+"github:typst/typst" = "latest"              # Typst 排版系统
 
 # ========================================
 # 环境变量

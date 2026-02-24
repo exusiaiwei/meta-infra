@@ -96,14 +96,19 @@ if [[ "$ENV" == "msys2" ]]; then
   META_DIR="$WIN_HOME/_Meta"
   CLOUD_LINK="$META_DIR/99_Cloud"
 
-  # 自动检测 OneDrive 文件夹（个人版 / 企业版名称不同）
+  # 自动检测 OneDrive 文件夹（个人版 / E5 开发者 / 企业版名称各不同）
+  # 优先找带后缀的版本（如 "OneDrive - MSFT"），最后才用裸 "OneDrive"
   ONEDRIVE_DIR=""
-  for candidate in "$WIN_HOME/OneDrive - MSFT" "$WIN_HOME/OneDrive" "$WIN_HOME/OneDrive - Personal"; do
+  for candidate in "$WIN_HOME"/OneDrive\ -\ *; do
     if [[ -d "$candidate" ]]; then
       ONEDRIVE_DIR="$candidate"
       break
     fi
   done
+  # 如果没找到带后缀的，试裸 OneDrive
+  if [[ -z "$ONEDRIVE_DIR" ]] && [[ -d "$WIN_HOME/OneDrive" ]]; then
+    ONEDRIVE_DIR="$WIN_HOME/OneDrive"
+  fi
 
   if [[ -n "$ONEDRIVE_DIR" ]]; then
     # 查找 OneDrive 下的同步文件夹（优先找 Exusiai_Ark，否则用根目录）

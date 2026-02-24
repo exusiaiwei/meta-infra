@@ -91,6 +91,32 @@ EOF
   echo "✅ .zshrc 已配置"
 fi
 
+# ---------- 同步 Windows 的 Git 配置 ----------
+WIN_HOME="/mnt/c/Users/${USER:-$(whoami)}"
+if [[ -f "$WIN_HOME/.gitconfig" ]] && [[ ! -f "$HOME/.gitconfig" ]]; then
+  echo ">> 同步 Windows Git 配置..."
+  cp "$WIN_HOME/.gitconfig" "$HOME/.gitconfig"
+  echo "   ✅ Git 配置已同步"
+elif [[ -f "$HOME/.gitconfig" ]]; then
+  echo "   ✅ Git 配置已存在"
+fi
+
+# ---------- 同步 Windows 的 SSH 密钥 ----------
+WIN_SSH="$WIN_HOME/.ssh"
+if [[ -d "$WIN_SSH" ]] && [[ ! -f "$HOME/.ssh/id_ed25519" ]]; then
+  echo ">> 同步 Windows SSH 密钥..."
+  mkdir -p "$HOME/.ssh"
+  cp "$WIN_SSH/id_ed25519" "$HOME/.ssh/id_ed25519" 2>/dev/null
+  cp "$WIN_SSH/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub" 2>/dev/null
+  cp "$WIN_SSH/known_hosts" "$HOME/.ssh/known_hosts" 2>/dev/null
+  chmod 700 "$HOME/.ssh"
+  chmod 600 "$HOME/.ssh/id_ed25519" 2>/dev/null
+  chmod 644 "$HOME/.ssh/id_ed25519.pub" 2>/dev/null
+  echo "   ✅ SSH 密钥已同步"
+elif [[ -f "$HOME/.ssh/id_ed25519" ]]; then
+  echo "   ✅ SSH 密钥已存在"
+fi
+
 # ---------- 用 Mise 安装 Node.js ----------
 echo ">> 安装 Node.js LTS..."
 ~/.local/bin/mise use --global node@lts 2>/dev/null || true

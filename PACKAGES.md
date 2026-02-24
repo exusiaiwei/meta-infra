@@ -50,11 +50,6 @@
 | Obsidian | `Obsidian.Obsidian` | 笔记 |
 | Zotero | `DigitalScholar.Zotero` | 文献管理 |
 
-#### AI — AI 工具
-| 软件 | Winget ID | 用途 |
-|------|-----------|------|
-| Cherry Studio | `kangfenmao.CherryStudio` | AI 客户端 |
-
 #### Media — 多媒体
 | 软件 | Winget ID | 用途 |
 |------|-----------|------|

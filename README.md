@@ -75,7 +75,6 @@ mise run setup:wsl   # WSL 环境配置（可选）
 - **tools** — PowerToys, Bitwarden, Clash Verge, AdGuard, NanaZip, FastCopy...
 - **dev** — VS Code, Cursor, Docker, GitHub CLI
 - **academic** — Obsidian, Zotero
-- **ai** — Cherry Studio
 - **media** — PotPlayer, File Converter
 - **communication** — 微信, QQ, Teams
 

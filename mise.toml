@@ -135,6 +135,7 @@ run = "powershell.exe -Command \"irm https://christitus.com/win | iex\""
 # ========== 维护任务 ==========
 
 [tasks.status]
+alias = "s"
 description = "显示系统状态"
 run = """
 echo '============================================'
@@ -160,6 +161,7 @@ wsl.exe --status 2>/dev/null | head -5 || echo '  (WSL 未安装)'
 """
 
 [tasks.update]
+alias = "u"
 description = "更新所有工具和包"
 run = """
 echo '>> 更新 Winget 应用...'
@@ -172,6 +174,7 @@ echo '✅ 更新完成'
 """
 
 [tasks.verify]
+alias = "v"
 description = "验证所有依赖工具是否已正确安装"
 run = """
 echo '============================================'
@@ -189,10 +192,4 @@ for tool in $tools; do
 done
 """
 
-# ========================================
-# 任务别名
-# ========================================
-[alias]
-s = "status"
-u = "update"
-v = "verify"
+

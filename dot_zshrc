@@ -48,8 +48,15 @@ alias gl='git log --oneline -20'
 alias gd='git diff'
 
 # ---------- Mise ----------
+# IMPORTANT: Do NOT use `eval "$(mise activate zsh)"` on MSYS2!
+# mise.exe is a Windows binary — it embeds its own path as C:\Users\...\mise.exe
+# in the shell hook code. MSYS2 zsh treats \U as null, \b as backspace, etc.,
+# causing "_mise_hook: command not found" spam on every prompt.
+#
+# Solution: use shims mode. This just adds ~/.local/share/mise/shims to PATH,
+# no precmd hooks, no embedded Windows paths.
 if command -v mise &>/dev/null; then
-  eval "$(mise activate zsh)"
+  eval "$(mise activate zsh --shims)"
 fi
 
 # ---------- Starship ----------

@@ -1,135 +1,164 @@
 #!/usr/bin/env zsh
 # ============================================================
 # meta-infra :: setup-all.sh
-# 在 zsh 里运行，完成 init.ps1 之后的所有配置
 # 用法: cd ~/_Meta/meta-infra && zsh scripts/setup-all.sh
 # ============================================================
 
-# nullglob: glob 无匹配时返回空而非报错
+# ---------- 修复 CRLF ----------
+find . -name '*.sh' -exec sed -i 's/\r$//' {} + 2>/dev/null
+find ./dotfiles -type f -exec sed -i 's/\r$//' {} + 2>/dev/null
+
+# ---------- PATH ----------
 setopt nullglob
-
-# 自动修复 CRLF（Windows git clone 可能带 CRLF，zsh 不认）
-for f in scripts/*.sh; do
-  sed -i 's/\r$//' "$f" 2>/dev/null
-done
-
-# ---------- 路径修复 ----------
 export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
-_add_path() { [[ -d "$1" ]] && export PATH="$1:$PATH"; }
-_add_path "/c/Windows/System32"
-_add_path "/c/Windows"
-_add_path "$HOME/AppData/Local/Microsoft/WinGet/Links"
-_add_path "$HOME/.local/share/mise/bin"
-_add_path "$HOME/.local/bin"
-_add_path "/c/Program Files/starship/bin"
-_add_path "$HOME/.pixi/bin"
+export PATH="/c/Windows/System32:/c/Windows:$PATH"
+[[ -d "$HOME/AppData/Local/Microsoft/WinGet/Links" ]] && export PATH="$HOME/AppData/Local/Microsoft/WinGet/Links:$PATH"
+[[ -d "$HOME/.local/share/mise/bin" ]] && export PATH="$HOME/.local/share/mise/bin:$PATH"
+[[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
 for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/jdx.mise_*/mise/bin; do
-  _add_path "$d"
+  [[ -d "$d" ]] && export PATH="$d:$PATH"
 done
-_add_path "/c/Program Files/Git/cmd"
-unset -f _add_path
+export PATH="/c/Program Files/starship/bin:/c/Program Files/Git/cmd:$PATH"
 
-REPO_DIR="${0:a:h:h}"  # 脚本所在目录的父目录
-cd "$REPO_DIR"
+cd "${0:a:h:h}"
+REPO_WIN=$(cygpath -w "$(pwd)")
+export MSYS2_ARG_CONV_EXCL="*"
 
 echo ''
 echo '╔══════════════════════════════════════════╗'
-echo '║   meta-infra :: 完整环境配置             ║'
+echo '║   meta-infra 环境配置                    ║'
 echo '╚══════════════════════════════════════════╝'
-echo ''
 
-# ---------- 1. Zsh 插件 ----------
-echo '━━━ 1/6: Zsh 插件 (pacman) ━━━'
-pacman -S --noconfirm --needed zsh-syntax-highlighting zsh-autosuggestions 2>&1 || echo '[警告] Zsh 插件安装失败'
+# ==================== 1. Zsh 插件 ====================
 echo ''
+echo '>>> 1/6: Zsh 插件'
+pacman -S --noconfirm --needed zsh-syntax-highlighting zsh-autosuggestions 2>&1 || true
 
-# ---------- 2. Dotfiles 同步 ----------
-echo '━━━ 2/6: Dotfiles 同步 ━━━'
-zsh scripts/sync-dotfiles.sh
+# ==================== 2. Dotfiles ====================
 echo ''
+echo '>>> 2/6: Dotfiles 同步'
+zsh scripts/sync-dotfiles.sh 2>&1 || echo '[!] Dotfiles 同步失败'
 
-# ---------- 3. Mise 信任 + CLI 工具 ----------
-echo '━━━ 3/6: CLI 工具 (mise) ━━━'
+# ==================== 3. CLI 工具 ====================
+echo ''
+echo '>>> 3/6: CLI 工具 (mise)'
 if command -v mise &>/dev/null; then
-  mise trust -a 2>/dev/null
-  mise install 2>&1 || echo '[警告] 部分 CLI 工具安装失败'
+  mise trust -a 2>/dev/null || true
+  mise install 2>&1 || echo '[!] 部分工具安装失败'
 else
-  echo '[跳过] mise 未找到，请确认 PATH 中包含 mise'
+  echo '[跳过] mise 不在 PATH 中'
+  echo '  手动运行: mise trust && mise install'
 fi
+
+# ==================== 4. GUI 应用 ====================
+echo ''
+echo '>>> 4/6: GUI 应用 (winget install)'
 echo ''
 
-# ---------- 4. GUI 应用 (winget) ----------
-echo '━━━ 4/6: GUI 应用 (winget) ━━━'
-export MSYS2_ARG_CONV_EXCL="*"
-
-# 检测 winget configure 是否可用
-USE_CONFIGURE=0
-if winget.exe configure --help &>/dev/null; then
-  USE_CONFIGURE=1
-fi
-
-# 核心层（自动装）
-echo '  [核心层] base.yaml'
-if [[ $USE_CONFIGURE -eq 1 ]]; then
-  winget.exe configure "$(cygpath -w manifests/core/base.yaml)" --accept-configuration-agreements 2>/dev/null || true
-else
-  grep 'id:' manifests/core/base.yaml 2>/dev/null | grep -v WinGet | grep -v '_' | sed 's/.*id:\s*//' | tr -d '[:space:]' | while read -r pkg_id; do
+# 直接用 winget install，不依赖 winget configure
+install_from_yaml() {
+  local yaml_file="$1"
+  local name=$(basename "$yaml_file" .yaml)
+  echo "  [$name]"
+  # 从 yaml 提取 winget 包 ID（settings 下面的 id 行，不包含 DSC 资源 ID）
+  grep -A1 'settings:' "$yaml_file" 2>/dev/null | grep 'id:' | sed 's/.*id:\s*//' | tr -d ' \r' | while IFS= read -r pkg_id; do
     [[ -z "$pkg_id" ]] && continue
-    echo "    安装: $pkg_id"
-    winget.exe install "$pkg_id" --source winget --silent --accept-package-agreements --accept-source-agreements 2>/dev/null || true
+    [[ "$pkg_id" == *"Microsoft.WinGet"* ]] && continue
+    echo "    $pkg_id"
+    winget.exe install "$pkg_id" --source winget --silent --accept-package-agreements --accept-source-agreements 2>&1 | tail -1 || true
   done
-fi
+}
 
-# 标准层（逐个选择）
+# 核心层（自动）
+echo '  [核心层 - 自动安装]'
+install_from_yaml manifests/core/base.yaml
+
+# 标准层（选择）
 echo ''
-echo '  [标准层] 选择要安装的模块：'
+echo '  [标准层 - 选择安装]'
 for f in manifests/standard/*.yaml; do
-  fname=$(basename "$f")
-  modname="${fname%.yaml}"
+  modname=$(basename "$f" .yaml)
   echo -n "  安装 ${modname}? [Y/n] "
   read -r choice
   if [[ "$choice" == "n" || "$choice" == "N" ]]; then
-    echo "    跳过 $modname"
-    continue
-  fi
-  echo "    安装: $fname"
-  if [[ $USE_CONFIGURE -eq 1 ]]; then
-    winget.exe configure "$(cygpath -w "$f")" --accept-configuration-agreements 2>/dev/null || true
+    echo "    跳过"
   else
-    grep 'id:' "$f" 2>/dev/null | grep -v WinGet | grep -v '_' | sed 's/.*id:\s*//' | tr -d '[:space:]' | while read -r pkg_id; do
-      [[ -z "$pkg_id" ]] && continue
-      echo "      安装: $pkg_id"
-      winget.exe install "$pkg_id" --source winget --silent --accept-package-agreements --accept-source-agreements 2>/dev/null || true
-    done
+    install_from_yaml "$f"
   fi
 done
-echo ''
 
-# ---------- 5. WSL (可选) ----------
-echo '━━━ 5/6: WSL 环境 ━━━'
-echo -n '  配置 WSL? [y/N] '
-read -r wsl_choice
-if [[ "$wsl_choice" == "y" || "$wsl_choice" == "Y" ]]; then
-  zsh scripts/setup-wsl.sh
+# ==================== 5. WSL ====================
+echo ''
+echo '>>> 5/6: WSL'
+if command -v wsl.exe &>/dev/null; then
+  # 检查 WSL 是否有发行版
+  if wsl.exe -l -q 2>/dev/null | grep -qi 'ubuntu\|debian'; then
+    echo -n '  WSL 已安装，配置环境? [y/N] '
+    read -r choice
+    if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
+      WSL_SCRIPT=$(echo "$REPO_WIN" | sed 's|\\|/|g; s|^\([A-Za-z]\):|/mnt/\L\1|')
+      wsl.exe -e bash "${WSL_SCRIPT}/scripts/setup-wsl.sh" || echo '[!] WSL 配置失败'
+    fi
+  else
+    echo '  WSL 已安装但无发行版'
+    echo '  运行: wsl --install -d Ubuntu'
+  fi
 else
-  echo '  跳过 WSL 配置'
+  echo '  [跳过] WSL 未安装'
+  echo '  运行: wsl --install'
 fi
-echo ''
 
-# ---------- 6. Git + SSH ----------
-echo '━━━ 6/6: Git + SSH ━━━'
-echo -n '  配置 Git + SSH? [Y/n] '
-read -r git_choice
-if [[ "$git_choice" != "n" && "$git_choice" != "N" ]]; then
-  zsh scripts/setup-git.sh
+# ==================== 6. Git + SSH ====================
+echo ''
+echo '>>> 6/6: Git + SSH'
+
+# Git 用户信息
+current_name=$(git config --global user.name 2>/dev/null || true)
+current_email=$(git config --global user.email 2>/dev/null || true)
+if [[ -n "$current_name" ]]; then
+  echo "  当前: $current_name <$current_email>"
+  echo -n '  重新配置? [y/N] '
+  read -r choice
+  [[ "$choice" != "y" && "$choice" != "Y" ]] && current_name="KEEP"
+fi
+if [[ "$current_name" != "KEEP" ]]; then
+  echo -n '  Git 用户名: '
+  read -r name
+  echo -n '  Git 邮箱: '
+  read -r email
+  git config --global user.name "$name"
+  git config --global user.email "$email"
+fi
+git config --global init.defaultBranch main
+git config --global core.autocrlf input
+git config --global pull.rebase true
+git config --global push.autoSetupRemote true
+
+# SSH 密钥
+SSH_KEY="$HOME/.ssh/id_ed25519"
+if [[ -f "$SSH_KEY" ]]; then
+  echo ''
+  echo "  SSH 密钥已存在"
+  echo "  $(cat ${SSH_KEY}.pub)"
 else
-  echo '  跳过 Git 配置'
+  echo ''
+  email=$(git config --global user.email 2>/dev/null || true)
+  hname=$(hostname 2>/dev/null || echo "pc")
+  uname=$(whoami 2>/dev/null || echo "user")
+  default_comment="${uname}@${hname}"
+  echo -n "  SSH 备注 [${default_comment}]: "
+  read -r comment
+  comment="${comment:-$default_comment}"
+  mkdir -p "$HOME/.ssh"
+  ssh-keygen -t ed25519 -C "$comment" -f "$SSH_KEY" -N "" 2>&1
+  echo ''
+  echo '  公钥（复制到 https://github.com/settings/keys）:'
+  echo ''
+  cat "${SSH_KEY}.pub"
 fi
 
 echo ''
 echo '╔══════════════════════════════════════════╗'
-echo '║   ✅ 全部配置完成！                      ║'
+echo '║   完成！重启终端生效                     ║'
 echo '╚══════════════════════════════════════════╝'
-echo ''
-echo '提示：重启终端让所有配置生效'
 echo ''

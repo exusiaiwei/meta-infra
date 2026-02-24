@@ -222,21 +222,10 @@ function Start-Bootstrap {
     }
     Write-Step "zsh 已就绪 ✓" "Green"
 
-    # 启用 winget configure 功能（超时 60 秒，Store 未就绪则跳过）
-    Write-Step "启用 winget configure（最多等 60 秒）..."
-    $configJob = Start-Job { winget configure --enable 2>$null }
-    $configReady = Wait-Job $configJob -Timeout 60
-    if ($configReady) {
-        Remove-Job $configJob -Force
-        Write-Step "winget configure 已启用 ✓" "Green"
-        $env:WINGET_USE_CONFIGURE = "1"
-    } else {
-        Stop-Job $configJob; Remove-Job $configJob -Force
-        Write-Host "[警告] winget configure 启用超时（Store 未就绪），将改用 winget install" -ForegroundColor Yellow
-        $env:WINGET_USE_CONFIGURE = "0"
-    }
+    # 启用 winget configure（后台尝试，不阻塞）
+    Start-Job { winget configure --enable 2>$null } | Out-Null
 
-    # 配置 Windows Terminal（在 PowerShell 里做，避免 python3 依赖）
+    # 配置 Windows Terminal
     $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
     if (Test-Path $wtSettingsPath) {
         try {
@@ -268,23 +257,16 @@ function Start-Bootstrap {
         }
     }
 
-    # 调用独立的 zsh 安装脚本（避免 PowerShell here-string 转义问题）
-    $msysPath = $INSTALL_DIR -replace '\\','/' -replace '^C:','/c'
-    Write-Step "启动 zsh 自动安装..."
-    $env:MSYSTEM = "MSYS"
-    $env:CHERE_INVOKING = "1"
-    & $ZSH_EXE "$msysPath/scripts/auto-install.sh" $msysPath $INSTALL_DIR
-
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Green
-    Write-Host "  ✅ meta-infra 引导完成！" -ForegroundColor Green
+    Write-Host "  ✅ 基础环境就绪！" -ForegroundColor Green
     Write-Host "============================================" -ForegroundColor Green
     Write-Host ""
-    Write-Host "打开 Windows Terminal，选择 zsh 配置，然后运行：" -ForegroundColor Yellow
-    Write-Host "  cd $INSTALL_DIR" -ForegroundColor Cyan
-    Write-Host "  mise trust" -ForegroundColor Cyan
-    Write-Host "  mise run setup:git   # Git + SSH 配置" -ForegroundColor Cyan
-    Write-Host "  mise run setup:wsl   # WSL 环境配置（可选）" -ForegroundColor Cyan
+    Write-Host "现在打开 Windows Terminal（zsh 已是默认），运行：" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  cd ~/_Meta/meta-infra && zsh scripts/setup-all.sh" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "这一条命令会完成所有剩余配置。" -ForegroundColor DarkGray
     Write-Host ""
 }
 

@@ -37,18 +37,23 @@ irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap/ini
 ```
 
 这一条命令会自动完成：
-1. ✅ 安装核心工具（Git, MSYS2, Mise, Starship, Windows Terminal）
-2. ✅ 克隆仓库（失败时提示手动下载 ZIP）
-3. ✅ 安装 Zsh 插件 + CLI 工具 + GUI 应用
-4. ✅ 同步 Dotfiles + 配置 WSL
+1. ✅ 安装核心工具（Git, MSYS2, zsh, Clash Verge, Mise, Starship, Windows Terminal）
+2. ✅ 配置 Windows Terminal（zsh 设为默认）
+3. ✅ 克隆仓库
 
-### 3. 手动收尾
+### 3. 打开 Windows Terminal，运行一键配置
 
 ```bash
-cd ~/_Meta/meta-infra
-mise run setup:git   # Git 用户信息 + SSH 密钥
-mise run setup:wsl   # WSL 环境（可选）
+cd ~/_Meta/meta-infra && zsh scripts/setup-all.sh
 ```
+
+这一步会交互式完成：
+- Zsh 插件安装
+- Dotfiles 同步
+- CLI 工具安装（mise）
+- GUI 应用安装（winget，可选择模块）
+- WSL 环境配置（可选）
+- Git + SSH 配置
 
 ### 离线 / 无法访问 GitHub？
 

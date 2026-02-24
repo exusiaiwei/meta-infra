@@ -181,6 +181,12 @@ export PATH="/usr/local/bin:/usr/bin:/bin:`$PATH"
 cd "$msysPath"
 
 echo '============================================'
+echo '  安装 Zsh 插件 (pacman)'
+echo '============================================'
+pacman -S --noconfirm --needed zsh-syntax-highlighting zsh-autosuggestions 2>&1 || echo '[警告] Zsh 插件安装失败'
+
+echo ''
+echo '============================================'
 echo '  安装 CLI 工具 (mise install)'
 echo '============================================'
 mise install 2>&1 || echo '[警告] 部分工具安装失败'

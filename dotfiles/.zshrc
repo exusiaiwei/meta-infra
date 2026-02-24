@@ -17,6 +17,18 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 # ---------- 按键绑定 ----------
 bindkey -e  # Emacs 模式
 
+# ---------- 插件 ----------
+# syntax-highlighting: 命令实时彩色高亮
+# autosuggestions: 灰色补全历史命令
+for plugin in zsh-syntax-highlighting zsh-autosuggestions; do
+  # MSYS2 路径
+  [[ -f /usr/share/zsh/plugins/$plugin/$plugin.zsh ]] && \
+    source /usr/share/zsh/plugins/$plugin/$plugin.zsh
+  # Ubuntu/Debian 路径
+  [[ -f /usr/share/$plugin/$plugin.zsh ]] && \
+    source /usr/share/$plugin/$plugin.zsh
+done
+
 # ---------- Aliases ----------
 alias ll='ls -lah --color=auto'
 alias la='ls -A --color=auto'

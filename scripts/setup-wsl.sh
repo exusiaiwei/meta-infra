@@ -33,6 +33,8 @@ sudo apt install -y \
   curl \
   wget \
   zsh \
+  zsh-syntax-highlighting \
+  zsh-autosuggestions \
   git
 
 # ---------- 设置 zsh 为默认 shell ----------

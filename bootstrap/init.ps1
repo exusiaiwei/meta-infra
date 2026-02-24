@@ -145,24 +145,45 @@ function Start-Bootstrap {
     Write-Host ""
 
     $gitDir = Join-Path $INSTALL_DIR ".git"
+    $miseToml = Join-Path $INSTALL_DIR "mise.toml"
 
     if (Test-Path $gitDir) {
+        # 情况 1: 已有 Git 仓库 → pull 更新
         Write-Step "仓库已存在，同步中..."
         Push-Location $INSTALL_DIR
-        try { git pull } catch { Write-Host "[警告] 同步失败" -ForegroundColor Yellow }
+        try { git pull } catch { Write-Host "[警告] 同步失败（可能无网络）" -ForegroundColor Yellow }
         Pop-Location
+    } elseif ((Test-Path $INSTALL_DIR) -and (Test-Path $miseToml)) {
+        # 情况 2: 手动放置的 ZIP 解压目录 → 直接使用
+        Write-Step "检测到手动放置的仓库文件，直接使用" "Yellow"
+        Write-Host "  提示: 联网后运行 'git init && git remote add origin $REPO_URL' 可转为 Git 仓库" -ForegroundColor DarkGray
     } elseif (Test-Path $INSTALL_DIR) {
-        Write-Host "[错误] 目录已存在但不是 Git 仓库: $INSTALL_DIR" -ForegroundColor Red
+        Write-Host "[错误] 目录已存在但不是 meta-infra 仓库: $INSTALL_DIR" -ForegroundColor Red
         exit 1
     } else {
+        # 情况 3: 全新安装 → 尝试 clone
         Write-Step "克隆仓库..."
-        # 确保父目录存在
         $parentDir = Split-Path $INSTALL_DIR -Parent
         if (-not (Test-Path $parentDir)) { New-Item -ItemType Directory -Path $parentDir -Force | Out-Null }
+
         git clone $REPO_URL $INSTALL_DIR
         if ($LASTEXITCODE -ne 0) {
-            Write-Host "[错误] 克隆失败" -ForegroundColor Red
-            exit 1
+            Write-Host ""
+            Write-Host "[提示] Clone 失败（可能无法访问 GitHub）" -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "  请手动下载仓库 ZIP 并解压到：" -ForegroundColor Cyan
+            Write-Host "    $INSTALL_DIR" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "  下载地址：" -ForegroundColor Cyan
+            Write-Host "    https://github.com/exusiaiwei/meta-infra/archive/refs/heads/master.zip" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "  解压后确保目录结构为：" -ForegroundColor DarkGray
+            Write-Host "    $INSTALL_DIR\mise.toml" -ForegroundColor DarkGray
+            Write-Host "    $INSTALL_DIR\manifests\" -ForegroundColor DarkGray
+            Write-Host "    $INSTALL_DIR\dotfiles\" -ForegroundColor DarkGray
+            Write-Host ""
+            Write-Host "  解压完成后重新运行此脚本即可继续。" -ForegroundColor Yellow
+            exit 0
         }
     }
     Write-Step "仓库已就绪 ✓" "Green"

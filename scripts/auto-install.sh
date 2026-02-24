@@ -42,28 +42,44 @@ echo '============================================'
 # 禁止 MSYS2 自动转换 winget.exe 的参数路径
 export MSYS2_ARG_CONV_EXCL="*"
 
+# 核心层（必装）
+echo "  [核心层] base.yaml"
 if [[ "${WINGET_USE_CONFIGURE:-1}" == "1" ]]; then
-  # 模式 1: winget configure（批量声明式）
-  winget.exe configure "$REPO_WIN\manifests\core\base.yaml" --accept-configuration-agreements 2>/dev/null
-  for f in manifests/standard/*.yaml; do
-    fname=$(basename "$f")
-    echo "  安装: $fname"
-    winget.exe configure "$REPO_WIN\manifests\standard\$fname" --accept-configuration-agreements 2>/dev/null
-  done
+  winget.exe configure "${REPO_WIN}\\manifests\\core\\base.yaml" --accept-configuration-agreements 2>/dev/null
 else
-  # 模式 2: winget install（逐个安装，从 YAML 提取包 ID）
-  echo "  (回退模式: 使用 winget install 逐个安装)"
-  for f in manifests/core/*.yaml manifests/standard/*.yaml; do
-    grep -E '^\s+id:' "$f" 2>/dev/null | while read -r line; do
-      pkg_id=$(echo "$line" | sed 's/.*id:\s*//' | tr -d '[:space:]')
-      # 跳过 DSC 资源 ID（只要 winget 包 ID）
-      [[ "$pkg_id" == *"WinGet"* ]] && continue
-      [[ "$pkg_id" == *"_"* ]] && continue
-      echo "  安装: $pkg_id"
-      winget.exe install "$pkg_id" --source winget --silent --accept-package-agreements --accept-source-agreements 2>/dev/null
-    done
+  grep -E '^\s+id:' manifests/core/base.yaml 2>/dev/null | while read -r line; do
+    pkg_id=$(echo "$line" | sed 's/.*id:\s*//' | tr -d '[:space:]')
+    [[ "$pkg_id" == *"WinGet"* || "$pkg_id" == *"_"* ]] && continue
+    echo "    安装: $pkg_id"
+    winget.exe install "$pkg_id" --source winget --silent --accept-package-agreements --accept-source-agreements 2>/dev/null
   done
 fi
+
+# 标准层（逐个选择）
+echo ''
+echo '  [标准层] 选择要安装的模块：'
+for f in manifests/standard/*.yaml; do
+  fname=$(basename "$f")
+  modname="${fname%.yaml}"
+  echo -n "  安装 ${modname}? [Y/n] "
+  read -r choice
+  if [[ "$choice" == "n" || "$choice" == "N" ]]; then
+    echo "    跳过 $modname"
+    continue
+  fi
+  echo "    安装: $fname"
+  if [[ "${WINGET_USE_CONFIGURE:-1}" == "1" ]]; then
+    yaml_path="${REPO_WIN}\\manifests\\standard\\${fname}"
+    winget.exe configure "$yaml_path" --accept-configuration-agreements 2>/dev/null
+  else
+    grep -E '^\s+id:' "$f" 2>/dev/null | while read -r line; do
+      pkg_id=$(echo "$line" | sed 's/.*id:\s*//' | tr -d '[:space:]')
+      [[ "$pkg_id" == *"WinGet"* || "$pkg_id" == *"_"* ]] && continue
+      echo "      安装: $pkg_id"
+      winget.exe install "$pkg_id" --source winget --silent --accept-package-agreements --accept-source-agreements 2>/dev/null
+    done
+  fi
+done
 
 echo ''
 echo '============================================'

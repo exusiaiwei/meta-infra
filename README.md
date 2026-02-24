@@ -130,6 +130,39 @@ mise run setup:dotfiles  # 同步配置文件
 
 ## 🔧 设备配置
 
+## ⚠️ 常见问题
+
+### Clash Verge TUN 模式与 WSL 冲突
+
+TUN 模式会劫持所有网络流量，导致 WSL2 无法联网。解决方案：
+
+**方法 1：排除 WSL 网卡（推荐）**
+
+Clash Verge → 设置 → Clash 字段 → 覆写 → 添加：
+
+```yaml
+tun:
+  auto-route: true
+  strict-route: false
+  exclude-interface:
+    - "vEthernet (WSL)"
+    - "vEthernet (WSL (Hyper-V firewall))"
+```
+
+**方法 2：不用 TUN，改用系统代理**
+
+系统代理模式下 WSL 不受影响，但 WSL 内需手动设置代理：
+
+```bash
+# 在 WSL 的 .zshrc 中加入（端口号按实际情况修改）
+export http_proxy="http://$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):7897"
+export https_proxy="$http_proxy"
+```
+
+---
+
+## 🔧 设备配置
+
 ### 主力机 (Win11 LTSC x86)
 ```bash
 mise run install              # 核心 + 标准层

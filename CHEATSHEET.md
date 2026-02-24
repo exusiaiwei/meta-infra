@@ -31,8 +31,11 @@ chezmoi update
 ## 重置 chezmoi 并重新部署（管理员 PowerShell）
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; Remove-Item -Recurse -Force "$env:USERPROFILE\.local\share\chezmoi","$env:USERPROFILE\.config\chezmoi" -ErrorAction SilentlyContinue; irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap.ps1 | iex
+Set-ExecutionPolicy Bypass -Scope Process -Force; Remove-Item -Recurse -Force "$env:USERPROFILE\.local\share\chezmoi" -ErrorAction SilentlyContinue; irm https://raw.githubusercontent.com/exusiaiwei/meta-infra/master/bootstrap.ps1 | iex
 ```
+
+> 注：用户配置（Git 用户名/邮箱）保存在 `~/.config/chezmoi/chezmoi.toml`，不会被清除。
+> 如果需要完全重置（包括重新输入 Git 信息），加上：`Remove-Item -Recurse -Force "$env:USERPROFILE\.config\chezmoi" -ErrorAction SilentlyContinue;`
 
 ---
 

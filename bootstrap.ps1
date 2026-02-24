@@ -81,14 +81,12 @@ if (-not (Get-Command "chezmoi" -ErrorAction SilentlyContinue)) {
 }
 Write-Step "chezmoi ✓" "Green"
 
-# 4. 清理上次可能失败的残留状态
+# 4. Clean up previous failed state (keep user config)
 $chezmoiSource = "$env:USERPROFILE\.local\share\chezmoi"
-$chezmoiConfig = "$env:USERPROFILE\.config\chezmoi"
-if ((Test-Path $chezmoiSource) -or (Test-Path $chezmoiConfig)) {
-    Write-Step "检测到 chezmoi 残留状态，清理中..."
+if (Test-Path $chezmoiSource) {
+    Write-Step "Cleaning previous chezmoi source..."
     Remove-Item -Recurse -Force $chezmoiSource -ErrorAction SilentlyContinue
-    Remove-Item -Recurse -Force $chezmoiConfig -ErrorAction SilentlyContinue
-    Write-Step "清理完成 ✓" "Green"
+    Write-Step "Clean ✓" "Green"
 }
 
 # 5. 一键部署

@@ -119,8 +119,29 @@ function Start-Bootstrap {
 
     Write-Host ""
 
-    # ---- 阶段 2: 克隆/更新仓库 ----
-    Write-Host "阶段 2/3: 准备仓库" -ForegroundColor Yellow
+    # ---- 阶段 2: 系统精调（可选）----
+    Write-Host "阶段 2/4: 系统精调" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  推荐在新装系统上运行，去除广告、遥测、Copilot 等" -ForegroundColor DarkGray
+    Write-Host "  工具: Chris Titus Tech's winutil (开源社区标准工具)" -ForegroundColor DarkGray
+    Write-Host ""
+    $tweakChoice = Read-Host "  是否运行系统精调？[Y/n]"
+    if ($tweakChoice -ne "n" -and $tweakChoice -ne "N") {
+        Write-Step "启动 winutil..."
+        try {
+            Invoke-RestMethod https://christitus.com/win | Invoke-Expression
+            Write-Step "系统精调完成 ✓" "Green"
+        } catch {
+            Write-Host "[警告] winutil 启动失败，可稍后手动运行: irm https://christitus.com/win | iex" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Step "跳过系统精调（可稍后运行: mise run tweak）" "DarkGray"
+    }
+
+    Write-Host ""
+
+    # ---- 阶段 3: 克隆/更新仓库 ----
+    Write-Host "阶段 3/4: 准备仓库" -ForegroundColor Yellow
     Write-Host ""
 
     $gitDir = Join-Path $INSTALL_DIR ".git"
@@ -147,8 +168,8 @@ function Start-Bootstrap {
     Write-Step "仓库已就绪 ✓" "Green"
     Write-Host ""
 
-    # ---- 阶段 3: 交给 zsh 完成剩余工作 ----
-    Write-Host "阶段 3/3: 自动安装 (zsh + mise)" -ForegroundColor Yellow
+    # ---- 阶段 4: 交给 zsh 完成剩余工作 ----
+    Write-Host "阶段 4/4: 自动安装 (zsh + mise)" -ForegroundColor Yellow
     Write-Host ""
 
     # 将 Windows 路径转为 MSYS2 路径

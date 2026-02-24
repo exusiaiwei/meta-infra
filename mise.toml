@@ -115,6 +115,12 @@ run = "zsh scripts/sync-dotfiles.sh"
 description = "一键配置 WSL 环境"
 run = "wsl.exe -e bash -c \"$(cat scripts/setup-wsl.sh)\""
 
+# ========== 系统精调 ==========
+
+[tasks.tweak]
+description = "系统精调（去广告、去遥测、关 Copilot）— 调用 winutil"
+run = "powershell.exe -Command \"irm https://christitus.com/win | iex\""
+
 # ========== 维护任务 ==========
 
 [tasks.status]

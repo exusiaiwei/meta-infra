@@ -1,11 +1,18 @@
 {{ if eq .chezmoi.os "windows" -}}
 # =============================================================================
-# 04 - 配置 Git + SSH
+# 04 - Configure Git + SSH
 # =============================================================================
-
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 $ErrorActionPreference = "Continue"
 
-Write-Host ">> 配置 Git..." -ForegroundColor Cyan
+# Refresh PATH (Git may have just been installed)
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+@("C:\Program Files\Git\cmd", "C:\Program Files\Git\bin") | ForEach-Object {
+    if ((Test-Path $_) -and ($env:Path -notlike "*$_*")) { $env:Path = "$_;$env:Path" }
+}
+
+Write-Host ">> Configuring Git..." -ForegroundColor Cyan
 
 git config --global user.name "{{ .name }}"
 git config --global user.email "{{ .email }}"
@@ -15,26 +22,26 @@ git config --global pull.rebase true
 git config --global push.autoSetupRemote true
 git config --global core.editor "code --wait"
 
-Write-Host "   ✓ Git: {{ .name }} <{{ .email }}>" -ForegroundColor Green
+Write-Host "   OK Git: {{ .name }} <{{ .email }}>" -ForegroundColor Green
 
-# SSH 密钥
+# SSH Key
 $SSH_KEY = "$env:USERPROFILE\.ssh\id_ed25519"
 if (-not (Test-Path $SSH_KEY)) {
-    Write-Host ">> 生成 SSH 密钥..." -ForegroundColor Cyan
+    Write-Host ">> Generating SSH key..." -ForegroundColor Cyan
     $sshDir = Split-Path $SSH_KEY -Parent
     if (-not (Test-Path $sshDir)) { New-Item -ItemType Directory -Path $sshDir -Force | Out-Null }
 
     $comment = "$env:USERNAME@$env:COMPUTERNAME"
     ssh-keygen -t ed25519 -C $comment -f $SSH_KEY -N '""'
 
-    Write-Host "   ✓ SSH 密钥已生成 ($comment)" -ForegroundColor Green
+    Write-Host "   OK SSH key generated ($comment)" -ForegroundColor Green
     Write-Host ""
-    Write-Host "   公钥（复制到 https://github.com/settings/keys）:" -ForegroundColor Yellow
+    Write-Host "   Add this public key to https://github.com/settings/keys :" -ForegroundColor Yellow
     Write-Host ""
     Get-Content "${SSH_KEY}.pub"
     Write-Host ""
 } else {
-    Write-Host "   ✓ SSH 密钥已存在" -ForegroundColor Green
+    Write-Host "   OK SSH key exists" -ForegroundColor Green
 }
 
 {{ end -}}

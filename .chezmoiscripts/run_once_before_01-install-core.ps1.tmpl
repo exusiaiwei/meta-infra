@@ -2,44 +2,41 @@
 # =============================================================================
 # 01 - 安装核心工具 (run_once: 只在首次部署时执行)
 # =============================================================================
-# 安装顺序：
-#   1. Clash Verge（代理加速后续下载）
-#   2. Git, MSYS2, Mise, Starship, Windows Terminal
-# =============================================================================
-
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 $ErrorActionPreference = "Continue"
 
 function Install-IfMissing {
     param([string]$Id, [string]$Name)
     $installed = winget list --id $Id --source winget 2>$null
     if ($LASTEXITCODE -eq 0 -and $installed -match [regex]::Escape($Id)) {
-        Write-Host "   ✓ $Name (已安装)" -ForegroundColor Green
+        Write-Host "   OK $Name (already installed)" -ForegroundColor Green
         return
     }
-    Write-Host "   + 安装 $Name..." -ForegroundColor Cyan
+    Write-Host "   + Installing $Name..." -ForegroundColor Cyan
     winget install $Id --source winget --silent --accept-package-agreements --accept-source-agreements
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "   ✓ $Name 安装成功" -ForegroundColor Green
+        Write-Host "   OK $Name installed" -ForegroundColor Green
     } else {
-        Write-Host "   ⚠ $Name 安装可能失败" -ForegroundColor Yellow
+        Write-Host "   WARN $Name may have failed" -ForegroundColor Yellow
     }
 }
 
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "  🚀 chezmoi: 安装核心工具" -ForegroundColor Cyan
+Write-Host "  [01] Install Core Tools" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
-Install-IfMissing "ClashVergeRev.ClashVergeRev" "Clash Verge Rev (代理)"
+Install-IfMissing "ClashVergeRev.ClashVergeRev" "Clash Verge Rev (Proxy)"
 Install-IfMissing "Git.Git"                     "Git"
-Install-IfMissing "MSYS2.MSYS2"                 "MSYS2 (Zsh + Unix 工具链)"
-Install-IfMissing "jdx.mise"                    "Mise (环境管理)"
-Install-IfMissing "Starship.Starship"           "Starship (提示符)"
+Install-IfMissing "MSYS2.MSYS2"                 "MSYS2 (Zsh + Unix Toolchain)"
+Install-IfMissing "jdx.mise"                    "Mise (Environment Manager)"
+Install-IfMissing "Starship.Starship"           "Starship (Prompt)"
 Install-IfMissing "Microsoft.WindowsTerminal"   "Windows Terminal"
 
 Write-Host ""
-Write-Host "  ✅ 核心工具安装完成" -ForegroundColor Green
+Write-Host "  Done: Core tools installed" -ForegroundColor Green
 Write-Host ""
 
 {{ end -}}

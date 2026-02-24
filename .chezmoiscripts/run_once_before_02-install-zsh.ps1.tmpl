@@ -1,21 +1,28 @@
 {{ if eq .chezmoi.os "windows" -}}
 # =============================================================================
-# 02 - 安装 Zsh 并配置 MSYS2 插件
+# 02 - Install Zsh + Plugins in MSYS2
 # =============================================================================
-
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 $ErrorActionPreference = "Continue"
 
 $BASH_EXE = "C:\msys64\usr\bin\bash.exe"
-$ZSH_EXE = "C:\msys64\usr\bin\zsh.exe"
 
 if (Test-Path $BASH_EXE) {
-    Write-Host ">> 确保 zsh + 插件已安装..." -ForegroundColor Cyan
+    Write-Host ">> Installing zsh + plugins (pacman)..." -ForegroundColor Cyan
     $env:MSYSTEM = "MSYS"
     $env:CHERE_INVOKING = "1"
-    & $BASH_EXE -lc "pacman -S --noconfirm --needed zsh zsh-syntax-highlighting zsh-autosuggestions"
-    Write-Host "   ✓ zsh + 插件就绪" -ForegroundColor Green
+    # Update pacman database first (fresh MSYS2 install has empty database)
+    & $BASH_EXE -lc "pacman -Sy --noconfirm 2>&1"
+    # Install zsh and plugins
+    & $BASH_EXE -lc "pacman -S --noconfirm --needed zsh zsh-syntax-highlighting zsh-autosuggestions 2>&1"
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "   OK zsh + plugins ready" -ForegroundColor Green
+    } else {
+        Write-Host "   WARN pacman install may have issues (exit: $LASTEXITCODE)" -ForegroundColor Yellow
+    }
 } else {
-    Write-Host "   ⚠ MSYS2 未安装，跳过" -ForegroundColor Yellow
+    Write-Host "   WARN MSYS2 not found, skipping" -ForegroundColor Yellow
 }
 
 {{ end -}}

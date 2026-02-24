@@ -1,14 +1,32 @@
 {{ if eq .chezmoi.os "windows" -}}
 # =============================================================================
-# 03 - 配置 Windows Terminal (zsh 设为默认)
+# 03 - Configure Windows Terminal (set zsh as default)
 # =============================================================================
-
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 $ErrorActionPreference = "Continue"
 
 $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+$wtSettingsDir = Split-Path $wtSettingsPath -Parent
+
+# Windows Terminal may not have been launched yet after install
+# The LocalState folder and settings.json won't exist until first launch
+if (-not (Test-Path $wtSettingsDir)) {
+    Write-Host "   Windows Terminal not yet initialized, launching briefly..." -ForegroundColor DarkGray
+    # Try to launch and close WT to generate default settings
+    try {
+        Start-Process "wt.exe" -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 3
+        Stop-Process -Name "WindowsTerminal" -ErrorAction SilentlyContinue -Force
+        Start-Sleep -Seconds 1
+    } catch {
+        Write-Host "   Could not auto-launch WT" -ForegroundColor DarkGray
+    }
+}
 
 if (-not (Test-Path $wtSettingsPath)) {
-    Write-Host "   ⚠ Windows Terminal 配置未找到，跳过" -ForegroundColor Yellow
+    Write-Host "   WARN Windows Terminal settings not found, skipping" -ForegroundColor Yellow
+    Write-Host "   Please launch Windows Terminal once, then run: chezmoi apply" -ForegroundColor DarkGray
     exit 0
 }
 
@@ -37,12 +55,12 @@ try {
         $wt.defaultProfile = $zshProfile.guid
 
         $wt | ConvertTo-Json -Depth 10 | Set-Content $wtSettingsPath -Encoding UTF8
-        Write-Host "   ✓ Windows Terminal: zsh 已添加并设为默认" -ForegroundColor Green
+        Write-Host "   OK Windows Terminal: zsh added as default" -ForegroundColor Green
     } else {
-        Write-Host "   ✓ Windows Terminal: zsh 已存在" -ForegroundColor Green
+        Write-Host "   OK Windows Terminal: zsh already exists" -ForegroundColor Green
     }
 } catch {
-    Write-Host "   ⚠ 无法配置 Windows Terminal: $_" -ForegroundColor Yellow
+    Write-Host "   WARN Could not configure Windows Terminal: $_" -ForegroundColor Yellow
 }
 
 {{ end -}}

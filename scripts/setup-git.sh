@@ -51,14 +51,25 @@ if [[ -f "$SSH_KEY" ]]; then
   echo "公钥内容:"
   echo ""
   cat "${SSH_KEY}.pub"
-else
   echo ""
-  echo "正在生成 SSH 密钥..."
+  read "reply?是否重新生成？[y/N] "
+  if [[ "$reply" =~ ^[Yy]$ ]]; then
+    rm -f "$SSH_KEY" "${SSH_KEY}.pub"
+  fi
+fi
+
+if [[ ! -f "$SSH_KEY" ]]; then
+  echo ""
   email=$(git config --global user.email)
+  hostname=$(hostname 2>/dev/null || echo "unknown")
+  default_comment="${email}@${hostname}"
+  read "comment?SSH 密钥备注 [${default_comment}]: "
+  comment="${comment:-$default_comment}"
+
   mkdir -p "$HOME/.ssh"
-  ssh-keygen -t ed25519 -C "$email" -f "$SSH_KEY" -N ""
+  ssh-keygen -t ed25519 -C "$comment" -f "$SSH_KEY" -N ""
   echo ""
-  echo "✅ SSH 密钥已生成"
+  echo "✅ SSH 密钥已生成（备注: $comment）"
   echo ""
   echo "请将以下公钥添加到 GitHub (https://github.com/settings/keys):"
   echo ""

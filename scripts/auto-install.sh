@@ -46,6 +46,9 @@ echo '============================================'
 zsh "$REPO_MSYS/scripts/sync-dotfiles.sh" 2>&1 || echo '[警告] Dotfiles 同步失败'
 
 echo ''
+zsh "$REPO_MSYS/scripts/setup-terminal.sh" 2>&1 || echo '[警告] Windows Terminal 配置失败'
+
+echo ''
 echo '============================================'
 echo '  配置 WSL 环境'
 echo '============================================'

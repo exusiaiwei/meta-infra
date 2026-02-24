@@ -122,6 +122,10 @@ run = "zsh \"${MISE_PROJECT_ROOT}/scripts/sync-dotfiles.sh\""
 description = "一键配置 WSL 环境"
 run = "wsl.exe -e bash -c \"$(cat \"${MISE_PROJECT_ROOT}/scripts/setup-wsl.sh\")\""
 
+[tasks."setup:terminal"]
+description = "将 zsh 添加到 Windows Terminal 并设为默认"
+run = "zsh \"${MISE_PROJECT_ROOT}/scripts/setup-terminal.sh\""
+
 # ========== 系统精调 ==========
 
 [tasks.tweak]

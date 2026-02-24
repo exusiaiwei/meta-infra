@@ -29,9 +29,9 @@ properties:
         source: winget
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: windhawk
+      id: mica_for_everyone
       settings:
-        id: RamenSoftware.Windhawk
+        id: MicaForEveryone.MicaForEveryone
         source: winget
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage

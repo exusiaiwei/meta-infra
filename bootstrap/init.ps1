@@ -215,7 +215,7 @@ function Start-Bootstrap {
     Write-Step "启动 zsh 自动安装..."
     $env:MSYSTEM = "MSYS"
     $env:CHERE_INVOKING = "1"
-    & $ZSH_EXE "$INSTALL_DIR\scripts\auto-install.sh" $msysPath $INSTALL_DIR
+    & $ZSH_EXE "$msysPath/scripts/auto-install.sh" $msysPath $INSTALL_DIR
 
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Green

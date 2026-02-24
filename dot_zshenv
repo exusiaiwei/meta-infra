@@ -30,7 +30,9 @@ _add_path "$HOME/AppData/Local/Microsoft/WinGet/Links"
 # Mise（多种安装方式）
 _add_path "$HOME/.local/share/mise/bin"
 _add_path "$HOME/.local/bin"
-# winget 安装的 mise（路径很长，动态查找）
+_add_path "$HOME/AppData/Local/Programs/mise/bin"
+_add_path "$HOME/AppData/Local/mise/bin"
+# winget 安装的 mise（Packages 目录，路径很长，动态查找）
 () {
   setopt localoptions nullglob
   for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/jdx.mise_*/mise/bin; do

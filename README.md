@@ -164,6 +164,23 @@ export http_proxy="http://$(cat /etc/resolv.conf | grep nameserver | awk '{print
 export https_proxy="$http_proxy"
 ```
 
+### TUN 模式下 Microsoft Store / UWP 应用无法联网
+
+UWP 应用有**回环隔离（Loopback Restriction）**，TUN 模式的代理流量无法到达 UWP 沙箱，导致 Store 下载卡住。
+
+**方法 1：Clash Verge 内置工具**
+
+设置 → 杂项 → **UWP 工具**，勾选需要放行的 UWP 应用（如 Microsoft Store）。
+
+**方法 2：命令行一键解除所有 UWP 回环限制**
+
+```powershell
+# 管理员 PowerShell
+Get-AppxPackage | ForEach-Object {
+    CheckNetIsolation.exe LoopbackExempt -a -n="$($_.PackageFamilyName)"
+} 2>$null
+```
+
 ---
 
 ## 🔧 设备配置

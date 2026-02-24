@@ -40,17 +40,6 @@ properties:
         id: ArminOsaj.AutoDarkMode
         source: winget
 
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: mactype
-      settings:
-        id: MacType.MacType
-        source: winget
-
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: yasb
-      settings:
-        id: AmN.yasb
-        source: winget
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: bitwarden

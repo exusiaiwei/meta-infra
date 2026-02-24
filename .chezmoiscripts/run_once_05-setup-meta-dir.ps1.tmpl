@@ -1,0 +1,35 @@
+{{ if eq .chezmoi.os "windows" -}}
+# =============================================================================
+# 05 - Setup _Meta directory structure + OneDrive link
+# =============================================================================
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+$ErrorActionPreference = "Continue"
+
+$metaDir = "$env:USERPROFILE\_Meta"
+$cloudLink = "$metaDir\99_Cloud"
+$oneDriveTarget = "$env:USERPROFILE\OneDrive - MSFT\Exusiai_Ark"
+
+# Create _Meta if needed
+if (-not (Test-Path $metaDir)) {
+    New-Item -ItemType Directory -Path $metaDir -Force | Out-Null
+    Write-Host "   OK Created ~/_Meta/" -ForegroundColor Green
+}
+
+# Link 99_Cloud -> OneDrive/Exusiai_Ark
+if (Test-Path $cloudLink) {
+    Write-Host "   OK ~/_Meta/99_Cloud already exists" -ForegroundColor Green
+} elseif (Test-Path $oneDriveTarget) {
+    # Junction doesn't need admin privileges
+    cmd /c mklink /J "$cloudLink" "$oneDriveTarget" >$null 2>&1
+    if (Test-Path $cloudLink) {
+        Write-Host "   OK ~/_Meta/99_Cloud -> OneDrive/Exusiai_Ark" -ForegroundColor Green
+    } else {
+        Write-Host "   WARN Could not create junction" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "   SKIP OneDrive folder not found: $oneDriveTarget" -ForegroundColor DarkGray
+    Write-Host "   Login to OneDrive first, then run: chezmoi apply" -ForegroundColor DarkGray
+}
+
+{{ end -}}

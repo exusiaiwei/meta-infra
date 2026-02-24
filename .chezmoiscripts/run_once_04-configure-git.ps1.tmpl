@@ -12,17 +12,39 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";
     if ((Test-Path $_) -and ($env:Path -notlike "*$_*")) { $env:Path = "$_;$env:Path" }
 }
 
-Write-Host ">> Configuring Git..." -ForegroundColor Cyan
+# Check existing Git config
+$currentName = git config --global user.name 2>$null
+$currentEmail = git config --global user.email 2>$null
 
-git config --global user.name "{{ .name }}"
-git config --global user.email "{{ .email }}"
+if ($currentName -and $currentEmail) {
+    Write-Host ">> Git already configured: $currentName <$currentEmail>" -ForegroundColor Green
+    Write-Host "   Template values: {{ .name }} <{{ .email }}>" -ForegroundColor DarkGray
+
+    if ($currentName -ne "{{ .name }}" -or $currentEmail -ne "{{ .email }}") {
+        $reply = Read-Host "   Overwrite with template values? [y/N]"
+        if ($reply -ne "y" -and $reply -ne "Y") {
+            Write-Host "   Keeping existing Git config" -ForegroundColor Green
+            $skipGitConfig = $true
+        }
+    } else {
+        Write-Host "   Values match, no change needed" -ForegroundColor Green
+        $skipGitConfig = $true
+    }
+}
+
+if (-not $skipGitConfig) {
+    Write-Host ">> Configuring Git..." -ForegroundColor Cyan
+    git config --global user.name "{{ .name }}"
+    git config --global user.email "{{ .email }}"
+    Write-Host "   OK Git: {{ .name }} <{{ .email }}>" -ForegroundColor Green
+}
+
+# Common Git settings (always apply)
 git config --global init.defaultBranch main
 git config --global core.autocrlf input
 git config --global pull.rebase true
 git config --global push.autoSetupRemote true
 git config --global core.editor "code --wait"
-
-Write-Host "   OK Git: {{ .name }} <{{ .email }}>" -ForegroundColor Green
 
 # SSH Key
 $SSH_KEY = "$env:USERPROFILE\.ssh\id_ed25519"

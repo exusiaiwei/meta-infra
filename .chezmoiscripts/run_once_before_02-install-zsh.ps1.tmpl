@@ -1,6 +1,6 @@
 {{ if eq .chezmoi.os "windows" -}}
 # =============================================================================
-# 02 - Install Zsh + Plugins in MSYS2
+# 02 - Install Zsh + Plugins + Configure MSYS2 HOME
 # =============================================================================
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -9,12 +9,22 @@ $ErrorActionPreference = "Continue"
 $BASH_EXE = "C:\msys64\usr\bin\bash.exe"
 
 if (Test-Path $BASH_EXE) {
-    Write-Host ">> Installing zsh + plugins (pacman)..." -ForegroundColor Cyan
+    Write-Host ">> Configuring MSYS2..." -ForegroundColor Cyan
     $env:MSYSTEM = "MSYS"
     $env:CHERE_INVOKING = "1"
-    # Update pacman database first (fresh MSYS2 install has empty database)
+
+    # CRITICAL: Set MSYS2 HOME to Windows user profile
+    # By default MSYS2 HOME = /home/<user>, but chezmoi deploys dotfiles to C:\Users\<user>
+    # Without this, zsh won't find .zshenv/.zshrc and PATH won't have mise etc.
+    & $BASH_EXE -lc "grep -q 'db_home.*windows' /etc/nsswitch.conf 2>/dev/null || sed -i 's/^db_home:.*/db_home: windows/' /etc/nsswitch.conf 2>/dev/null || echo 'db_home: windows' >> /etc/nsswitch.conf"
+    Write-Host "   OK MSYS2 HOME -> Windows user profile" -ForegroundColor Green
+
+    # Update pacman database (fresh MSYS2 has empty database)
+    Write-Host ">> Updating pacman database..." -ForegroundColor Cyan
     & $BASH_EXE -lc "pacman -Sy --noconfirm 2>&1"
+
     # Install zsh and plugins
+    Write-Host ">> Installing zsh + plugins..." -ForegroundColor Cyan
     & $BASH_EXE -lc "pacman -S --noconfirm --needed zsh zsh-syntax-highlighting zsh-autosuggestions 2>&1"
     if ($LASTEXITCODE -eq 0) {
         Write-Host "   OK zsh + plugins ready" -ForegroundColor Green

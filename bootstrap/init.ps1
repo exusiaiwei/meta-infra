@@ -233,7 +233,7 @@ echo ''
 echo '============================================'
 echo '  同步 Dotfiles'
 echo '============================================'
-zsh scripts/sync-dotfiles.sh 2>&1 || echo '[警告] Dotfiles 同步失败'
+zsh "$msysPath/scripts/sync-dotfiles.sh" 2>&1 || echo '[警告] Dotfiles 同步失败'
 
 echo ''
 echo '============================================'
@@ -243,7 +243,7 @@ if command -v wsl.exe &>/dev/null; then
   # 检测 WSL 是否已初始化（有默认发行版）
   if wsl.exe -l -q 2>/dev/null | head -1 | grep -qi '[a-z]'; then
     echo '检测到 WSL 已安装，自动配置中...'
-    wsl.exe -e bash -c "$(cat scripts/setup-wsl.sh)" 2>&1 || echo '[警告] WSL 配置失败'
+    wsl.exe -e bash "$winPath\scripts\setup-wsl.sh" 2>&1 || echo '[警告] WSL 配置失败'
   else
     echo 'WSL 已安装但未初始化发行版'
     echo '请先运行: wsl.exe --install -d Ubuntu'

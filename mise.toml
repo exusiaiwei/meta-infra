@@ -55,11 +55,13 @@ pixi = "latest"           # 现代 Python/Conda 包管理器
 [tasks.install]
 description = "安装所有 Winget 应用（核心 + 标准层）"
 run = """
+export MSYS2_ARG_CONV_EXCL="*"
+ROOT="${MISE_PROJECT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 echo '>> 安装核心层...'
-winget.exe configure manifests/core/base.yaml --accept-configuration-agreements
+winget.exe configure "$ROOT/manifests/core/base.yaml" --accept-configuration-agreements
 echo '>> 安装标准层...'
-for f in manifests/standard/*.yaml; do
-  echo "  安装: $f"
+for f in "$ROOT"/manifests/standard/*.yaml; do
+  echo "  安装: $(basename $f)"
   winget.exe configure "$f" --accept-configuration-agreements
 done
 echo '✅ 所有应用安装完成'
@@ -67,7 +69,7 @@ echo '✅ 所有应用安装完成'
 
 [tasks."install:core"]
 description = "仅安装核心层"
-run = "winget.exe configure manifests/core/base.yaml --accept-configuration-agreements"
+run = "export MSYS2_ARG_CONV_EXCL='*' && winget.exe configure \"${MISE_PROJECT_ROOT}/manifests/core/base.yaml\" --accept-configuration-agreements"
 
 [tasks."install:optional"]
 description = "安装可选模块（交互式选择）"
@@ -97,11 +99,12 @@ done
 description = "完整配置向导（Git + Dotfiles + WSL）"
 depends = ["setup:git", "setup:dotfiles"]
 run = """
+ROOT="${MISE_PROJECT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 echo ''
 echo '是否配置 WSL 环境？'
 read 'reply?[y/N] '
 if [[ "$reply" =~ ^[Yy]$ ]]; then
-  wsl.exe -e bash -c "$(cat scripts/setup-wsl.sh)"
+  wsl.exe -e bash -c "$(cat "$ROOT/scripts/setup-wsl.sh")"
 fi
 echo ''
 echo '✅ 所有配置完成！'
@@ -109,15 +112,15 @@ echo '✅ 所有配置完成！'
 
 [tasks."setup:git"]
 description = "配置 Git 用户信息 + 生成 SSH 密钥"
-run = "zsh scripts/setup-git.sh"
+run = "zsh \"${MISE_PROJECT_ROOT}/scripts/setup-git.sh\""
 
 [tasks."setup:dotfiles"]
 description = "同步 dotfiles（符号链接）"
-run = "zsh scripts/sync-dotfiles.sh"
+run = "zsh \"${MISE_PROJECT_ROOT}/scripts/sync-dotfiles.sh\""
 
 [tasks."setup:wsl"]
 description = "一键配置 WSL 环境"
-run = "wsl.exe -e bash -c \"$(cat scripts/setup-wsl.sh)\""
+run = "wsl.exe -e bash -c \"$(cat \"${MISE_PROJECT_ROOT}/scripts/setup-wsl.sh\")\""
 
 # ========== 系统精调 ==========
 

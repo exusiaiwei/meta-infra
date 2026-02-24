@@ -52,6 +52,18 @@ _add_path "/c/Program Files/starship/bin"
 # Pixi（如果存在）
 _add_path "$HOME/.pixi/bin"
 
+# ---------- 终极兜底：问 PowerShell ----------
+# 如果以上所有路径都没找到 mise，让 PowerShell 告诉我们它在哪
+if ! command -v mise &>/dev/null; then
+  _win_path=$(powershell.exe -NoProfile -Command '(Get-Command mise -ErrorAction SilentlyContinue).Source' 2>/dev/null | tr -d '\r\n')
+  if [[ -n "$_win_path" ]]; then
+    # C:\foo\bar → /c/foo/bar
+    _unix_dir=$(echo "$_win_path" | sed 's|\\|/|g; s|^\([A-Za-z]\):|/\L\1|' | xargs dirname)
+    _add_path "$_unix_dir"
+  fi
+  unset _win_path _unix_dir
+fi
+
 unset -f _add_path
 
 # 编辑器

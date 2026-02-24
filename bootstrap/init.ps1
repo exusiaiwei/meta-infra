@@ -210,82 +210,12 @@ function Start-Bootstrap {
     }
     Write-Step "zsh 已就绪 ✓" "Green"
 
-    # 将 Windows 路径转为 MSYS2 路径
+    # 调用独立的 zsh 安装脚本（避免 PowerShell here-string 转义问题）
     $msysPath = $INSTALL_DIR -replace '\\','/' -replace '^C:','/c'
-    # Windows 风格路径给 winget 用
-    $winPath = $INSTALL_DIR -replace '/','\\'
-
-    # 构建 zsh 要执行的脚本
-    $zshScript = @"
-export PATH="/usr/local/bin:/usr/bin:/bin:`$PATH"
-cd "$msysPath"
-
-echo '============================================'
-echo '  安装 Zsh 插件 (pacman)'
-echo '============================================'
-pacman -S --noconfirm --needed zsh-syntax-highlighting zsh-autosuggestions 2>&1 || echo '[警告] Zsh 插件安装失败'
-
-echo ''
-echo '============================================'
-echo '  安装 CLI 工具 (mise install)'
-echo '============================================'
-mise install 2>&1 || echo '[警告] 部分工具安装失败'
-
-echo ''
-echo '============================================'
-echo '  安装 GUI 应用 (winget configure)'
-echo '============================================'
-
-# 安装核心 + 标准层（用 Windows 绝对路径，避免 MSYS2 路径转换）
-MSYS2_ARG_CONV_EXCL="*"
-export MSYS2_ARG_CONV_EXCL
-winget.exe configure "$winPath\manifests\core\base.yaml" --accept-configuration-agreements 2>/dev/null
-for f in manifests/standard/*.yaml; do
-  fname=`$(basename "`$f")
-  echo "  安装: `$fname"
-  winget.exe configure "$winPath\manifests\standard\`$fname" --accept-configuration-agreements 2>/dev/null
-done
-
-echo ''
-echo '============================================'
-echo '  同步 Dotfiles'
-echo '============================================'
-zsh "$msysPath/scripts/sync-dotfiles.sh" 2>&1 || echo '[警告] Dotfiles 同步失败'
-
-echo ''
-echo '============================================'
-echo '  配置 WSL 环境'
-echo '============================================'
-if command -v wsl.exe &>/dev/null; then
-  # 检测 WSL 是否已初始化（有默认发行版）
-  if wsl.exe -l -q 2>/dev/null | head -1 | grep -qi '[a-z]'; then
-    echo '检测到 WSL 已安装，自动配置中...'
-    wsl.exe -e bash "$winPath\scripts\setup-wsl.sh" 2>&1 || echo '[警告] WSL 配置失败'
-  else
-    echo 'WSL 已安装但未初始化发行版'
-    echo '请先运行: wsl.exe --install -d Ubuntu'
-    echo '然后重启，再运行: mise run setup:wsl'
-  fi
-else
-  echo 'WSL 未安装，跳过'
-fi
-
-echo ''
-echo '============================================'
-echo '  ✅ 全自动安装完成！'
-echo '============================================'
-echo ''
-echo '还需要手动完成的:'
-echo '  1. mise run setup:git   → 配置 Git 用户信息 + SSH 密钥'
-echo '  2. 如果 WSL 未初始化: wsl --install -d Ubuntu → 重启 → mise run setup:wsl'
-echo ''
-"@
-
-    # 调用 MSYS2 的 zsh 执行
     Write-Step "启动 zsh 自动安装..."
     $env:MSYSTEM = "MSYS"
     $env:CHERE_INVOKING = "1"
-    & $ZSH_EXE -c $zshScript
+    & $ZSH_EXE "$INSTALL_DIR\scripts\auto-install.sh" $msysPath $INSTALL_DIR
 
     Write-Host ""
     Write-Host "============================================" -ForegroundColor Green
@@ -294,6 +224,7 @@ echo ''
     Write-Host ""
     Write-Host "打开 Windows Terminal，选择 zsh 配置，然后运行：" -ForegroundColor Yellow
     Write-Host "  cd $INSTALL_DIR" -ForegroundColor Cyan
+    Write-Host "  mise trust" -ForegroundColor Cyan
     Write-Host "  mise run setup:git   # Git + SSH 配置" -ForegroundColor Cyan
     Write-Host "  mise run setup:wsl   # WSL 环境配置（可选）" -ForegroundColor Cyan
     Write-Host ""

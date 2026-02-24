@@ -222,21 +222,10 @@ function Start-Bootstrap {
     }
     Write-Step "zsh 已就绪 ✓" "Green"
 
-    # 启用 winget configure 实验功能（在 PowerShell 里做，避免 python3 依赖）
-    $wingetSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json"
-    if (Test-Path $wingetSettingsPath) {
-        try {
-            $ws = Get-Content $wingetSettingsPath -Raw | ConvertFrom-Json
-            if (-not $ws.experimentalFeatures) {
-                $ws | Add-Member -NotePropertyName "experimentalFeatures" -NotePropertyValue @{} -Force
-            }
-            $ws.experimentalFeatures | Add-Member -NotePropertyName "configuration" -NotePropertyValue $true -Force
-            $ws | ConvertTo-Json -Depth 10 | Set-Content $wingetSettingsPath -Encoding UTF8
-            Write-Step "winget configure 已启用 ✓" "Green"
-        } catch {
-            Write-Host "[警告] 无法修改 winget 设置" -ForegroundColor Yellow
-        }
-    }
+    # 启用 winget configure 功能
+    Write-Step "启用 winget configure..."
+    winget configure --enable 2>$null
+    Write-Step "winget configure 已启用 ✓" "Green"
 
     # 配置 Windows Terminal（在 PowerShell 里做，避免 python3 依赖）
     $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"

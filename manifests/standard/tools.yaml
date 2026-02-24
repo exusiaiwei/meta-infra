@@ -110,4 +110,11 @@ properties:
       settings:
         id: amir1376.ABDownloadManager
         source: winget
+
+    # === 个性化 (Microsoft Store) ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: dynamic_theme
+      settings:
+        id: 9NBLGGH1ZBKW
+        source: msstore
   configurationVersion: 0.2.0

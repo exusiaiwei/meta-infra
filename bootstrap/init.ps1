@@ -38,13 +38,31 @@ function Test-CommandExists {
 }
 
 function Refresh-Path {
+    # 从注册表重新读取 PATH
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+    # 手动追加常见安装路径（winget 安装后注册表可能还没写入）
+    $extraPaths = @(
+        "C:\Program Files\Git\cmd",
+        "C:\Program Files\Git\bin",
+        "C:\msys64\usr\bin",
+        "$env:LOCALAPPDATA\Programs\mise\bin",
+        "$env:LOCALAPPDATA\Programs\starship\bin",
+        "C:\Program Files\Starship\bin"
+    )
+    foreach ($p in $extraPaths) {
+        if ((Test-Path $p) -and ($env:Path -notlike "*$p*")) {
+            $env:Path = "$p;$env:Path"
+        }
+    }
 }
 
 function Install-WingetPackage {
     param([string]$Id, [string]$Name)
     Write-Step "安装 $Name..."
-    winget install $Id --silent --accept-package-agreements --accept-source-agreements
+    # --source winget: 避免搜索 msstore 源（新系统 Store 未初始化会报错）
+    winget install $Id --source winget --silent --accept-package-agreements --accept-source-agreements
+    Start-Sleep -Seconds 2  # 等待安装程序写入 PATH
     Refresh-Path
 }
 

@@ -3,6 +3,13 @@
 # =============================================================================
 # 这个文件只设置 PATH 和环境变量，不做任何交互式配置
 
+# ---------- HOME 目录统一 ----------
+# MSYS2 默认 HOME=/home/<user>，但我们的文件都在 Windows 用户目录下
+# 将 HOME 重定向到 /c/Users/<user>，使 ~ 路径一致
+if [[ -d "/c/Users" ]] && [[ "$HOME" == /home/* ]]; then
+  export HOME="/c/Users/$(whoami)"
+fi
+
 # MSYS2 工具链
 export PATH="/clangarm64/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 

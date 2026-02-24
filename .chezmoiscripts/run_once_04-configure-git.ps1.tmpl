@@ -12,22 +12,20 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";
     if ((Test-Path $_) -and ($env:Path -notlike "*$_*")) { $env:Path = "$_;$env:Path" }
 }
 
-# Check existing Git config
+# ---- Git user info ----
 $currentName = git config --global user.name 2>$null
 $currentEmail = git config --global user.email 2>$null
+$skipGitConfig = $false
 
 if ($currentName -and $currentEmail) {
     Write-Host ">> Git already configured: $currentName <$currentEmail>" -ForegroundColor Green
-    Write-Host "   Template values: {{ .name }} <{{ .email }}>" -ForegroundColor DarkGray
-
     if ($currentName -ne "{{ .name }}" -or $currentEmail -ne "{{ .email }}") {
+        Write-Host "   Template values: {{ .name }} <{{ .email }}>" -ForegroundColor DarkGray
         $reply = Read-Host "   Overwrite with template values? [y/N]"
         if ($reply -ne "y" -and $reply -ne "Y") {
-            Write-Host "   Keeping existing Git config" -ForegroundColor Green
             $skipGitConfig = $true
         }
     } else {
-        Write-Host "   Values match, no change needed" -ForegroundColor Green
         $skipGitConfig = $true
     }
 }
@@ -46,24 +44,34 @@ git config --global pull.rebase true
 git config --global push.autoSetupRemote true
 git config --global core.editor "code --wait"
 
-# SSH Key
+# ---- SSH Key ----
 $SSH_KEY = "$env:USERPROFILE\.ssh\id_ed25519"
-if (-not (Test-Path $SSH_KEY)) {
-    Write-Host ">> Generating SSH key..." -ForegroundColor Cyan
-    $sshDir = Split-Path $SSH_KEY -Parent
-    if (-not (Test-Path $sshDir)) { New-Item -ItemType Directory -Path $sshDir -Force | Out-Null }
-
-    $comment = "$env:USERNAME@$env:COMPUTERNAME"
-    ssh-keygen -t ed25519 -C $comment -f $SSH_KEY -N '""'
-
-    Write-Host "   OK SSH key generated ($comment)" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "   Add this public key to https://github.com/settings/keys :" -ForegroundColor Yellow
-    Write-Host ""
-    Get-Content "${SSH_KEY}.pub"
-    Write-Host ""
-} else {
-    Write-Host "   OK SSH key exists" -ForegroundColor Green
+if (Test-Path $SSH_KEY) {
+    Write-Host ">> SSH key already exists" -ForegroundColor Green
+    Write-Host "   $(Get-Content "${SSH_KEY}.pub")" -ForegroundColor DarkGray
+    $reply = Read-Host "   Regenerate? [y/N]"
+    if ($reply -ne "y" -and $reply -ne "Y") {
+        Write-Host "   Keeping existing SSH key" -ForegroundColor Green
+        exit 0
+    }
 }
+
+Write-Host ">> Generating SSH key..." -ForegroundColor Cyan
+$sshDir = Split-Path $SSH_KEY -Parent
+if (-not (Test-Path $sshDir)) { New-Item -ItemType Directory -Path $sshDir -Force | Out-Null }
+
+# Format: username@Hostname (hostname with first letter uppercase, rest lowercase)
+$rawHost = $env:COMPUTERNAME.ToLower()
+$hostname = $rawHost.Substring(0,1).ToUpper() + $rawHost.Substring(1)
+$comment = "$env:USERNAME@$hostname"
+
+ssh-keygen -t ed25519 -C $comment -f $SSH_KEY -N '""'
+
+Write-Host "   OK SSH key generated ($comment)" -ForegroundColor Green
+Write-Host ""
+Write-Host "   Add this public key to https://github.com/settings/keys :" -ForegroundColor Yellow
+Write-Host ""
+Get-Content "${SSH_KEY}.pub"
+Write-Host ""
 
 {{ end -}}

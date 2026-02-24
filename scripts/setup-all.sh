@@ -8,6 +8,11 @@
 # nullglob: glob 无匹配时返回空而非报错
 setopt nullglob
 
+# 自动修复 CRLF（Windows git clone 可能带 CRLF，zsh 不认）
+for f in scripts/*.sh; do
+  sed -i 's/\r$//' "$f" 2>/dev/null
+done
+
 # ---------- 路径修复 ----------
 export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 _add_path() { [[ -d "$1" ]] && export PATH="$1:$PATH"; }

@@ -75,10 +75,10 @@ properties:
 
     # === File Tools ===
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: fastcopy
+      id: robocopyex
       settings:
-        id: FastCopy.FastCopy
-        source: winget
+        id: 9PKJK0BHNVFN
+        source: msstore
 
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: geek_uninstaller

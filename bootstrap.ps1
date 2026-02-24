@@ -16,6 +16,9 @@
 #Requires -Version 5.1
 $ErrorActionPreference = "Stop"
 
+# 解除执行策略限制（新装系统默认 Restricted，会阻止 .ps1 脚本运行）
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8

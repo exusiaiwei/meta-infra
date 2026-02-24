@@ -4,3 +4,9 @@
 [data]
     email = "{{ promptStringOnce . "email" "Git email" }}"
     name = "{{ promptStringOnce . "name" "Git username" }}"
+
+# PowerShell 脚本解释器配置
+# 新装 Windows 默认执行策略为 Restricted，必须用 Bypass 才能执行 .ps1 脚本
+[interpreters.ps1]
+    command = "powershell.exe"
+    args = ["-NoProfile", "-ExecutionPolicy", "Bypass"]

@@ -93,6 +93,12 @@ properties:
         id: Microsoft.Edge
         source: winget
 
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: zen_browser
+      settings:
+        id: Zen-Team.Zen-Browser
+        source: winget
+
     # === Download ===
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: ab_download_manager

@@ -32,12 +32,18 @@ _add_path "$HOME/.local/share/mise/bin"
 _add_path "$HOME/.local/bin"
 _add_path "$HOME/AppData/Local/Programs/mise/bin"
 _add_path "$HOME/AppData/Local/mise/bin"
-# winget 安装的 mise（Packages 目录，路径很长，动态查找）
+# winget 安装的 mise 和 chezmoi（glob 可能在长路径下失败，用 find 兜底）
 () {
   setopt localoptions nullglob
-  for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/jdx.mise_*/mise/bin; do
-    _add_path "$d"
-  done
+  local pkg_base="$HOME/AppData/Local/Microsoft/WinGet/Packages"
+  # Try glob first
+  for d in "$pkg_base"/jdx.mise_*/mise/bin; do _add_path "$d"; done
+  for d in "$pkg_base"/twpayne.chezmoi_*; do _add_path "$d"; done
+  # Fallback: find
+  if ! command -v mise &>/dev/null && [[ -d "$pkg_base" ]]; then
+    local mise_dir=$(find "$pkg_base" -maxdepth 3 -name 'mise.exe' -print -quit 2>/dev/null)
+    [[ -n "$mise_dir" ]] && _add_path "$(dirname "$mise_dir")"
+  fi
 }
 
 # Starship
@@ -45,14 +51,6 @@ _add_path "/c/Program Files/starship/bin"
 
 # Pixi（如果存在）
 _add_path "$HOME/.pixi/bin"
-
-# chezmoi
-() {
-  setopt localoptions nullglob
-  for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/twpayne.chezmoi_*; do
-    _add_path "$d"
-  done
-}
 
 unset -f _add_path
 

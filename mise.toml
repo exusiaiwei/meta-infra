@@ -43,7 +43,7 @@ pixi = "latest"           # 现代 Python/Conda 包管理器
 # mise.exe 在 Windows 上默认用 cmd /c 执行 inline 任务，
 # 但我们的任务全部用 zsh 语法（export, for, if 等），
 # 所以必须显式指定用 MSYS2 的 zsh 来执行。
-windows_default_inline_shell_args = ["C:\\msys64\\usr\\bin\\zsh.exe", "-c"]
+windows_default_inline_shell_args = "C:/msys64/usr/bin/zsh.exe -c"
 
 # ========================================
 # 环境变量
@@ -141,6 +141,93 @@ run = "zsh \"${MISE_PROJECT_ROOT}/scripts/setup-terminal.sh\""
 description = "系统精调（去广告、去遥测、关 Copilot）— 调用 winutil"
 run = "powershell.exe -Command \"irm https://christitus.com/win | iex\""
 
+# ========== Antigravity 配置备份/恢复 ==========
+
+[tasks."backup:antigravity"]
+alias = "ba"
+description = "导出 Antigravity 配置到 OneDrive（settings + keybindings + 扩展列表）"
+run = """
+AG_CONFIG="$HOME/AppData/Roaming/Antigravity/User"
+AG_CLI="$HOME/AppData/Local/Programs/Antigravity/bin/antigravity.cmd"
+BACKUP_DIR="$HOME/OneDrive - MSFT/Backup/Configs/antigravity"
+
+if [[ ! -d "$AG_CONFIG" ]]; then
+  echo "❌ Antigravity 配置目录不存在: $AG_CONFIG"
+  exit 1
+fi
+
+mkdir -p "$BACKUP_DIR"
+
+echo '>> 备份 settings.json...'
+cp "$AG_CONFIG/settings.json" "$BACKUP_DIR/settings.json"
+
+echo '>> 备份 keybindings.json...'
+cp "$AG_CONFIG/keybindings.json" "$BACKUP_DIR/keybindings.json" 2>/dev/null || echo '   (跳过: keybindings.json 不存在)'
+
+echo '>> 导出扩展列表...'
+if [[ -x "$AG_CLI" ]]; then
+  "$AG_CLI" --list-extensions 2>/dev/null | grep -v '^[[]' > "$BACKUP_DIR/extensions.txt"
+else
+  # 从扩展目录直接读取
+  ls -d "$HOME/.antigravity/extensions"/*/ 2>/dev/null \
+    | xargs -I{} basename {} \
+    | sed 's/-[0-9].*$//' \
+    > "$BACKUP_DIR/extensions.txt"
+fi
+
+count=$(wc -l < "$BACKUP_DIR/extensions.txt" 2>/dev/null || echo 0)
+echo "✅ 备份完成 → $BACKUP_DIR"
+echo "   settings.json + keybindings.json + $count 个扩展"
+echo '   OneDrive 会自动同步到其他设备'
+"""
+
+[tasks."restore:antigravity"]
+alias = "ra"
+description = "从 OneDrive 恢复 Antigravity 配置（settings + keybindings + 安装扩展）"
+run = """
+AG_CONFIG="$HOME/AppData/Roaming/Antigravity/User"
+AG_CLI="$HOME/AppData/Local/Programs/Antigravity/bin/antigravity.cmd"
+BACKUP_DIR="$HOME/OneDrive - MSFT/Backup/Configs/antigravity"
+
+if [[ ! -d "$BACKUP_DIR" ]]; then
+  echo "❌ 备份目录不存在: $BACKUP_DIR"
+  echo "   请先登录 OneDrive 并同步文件"
+  exit 1
+fi
+
+mkdir -p "$AG_CONFIG"
+
+echo '>> 恢复 settings.json...'
+if [[ -f "$BACKUP_DIR/settings.json" ]]; then
+  cp "$BACKUP_DIR/settings.json" "$AG_CONFIG/settings.json"
+  echo '   ✅ settings.json'
+fi
+
+echo '>> 恢复 keybindings.json...'
+if [[ -f "$BACKUP_DIR/keybindings.json" ]]; then
+  cp "$BACKUP_DIR/keybindings.json" "$AG_CONFIG/keybindings.json"
+  echo '   ✅ keybindings.json'
+fi
+
+echo '>> 安装扩展...'
+if [[ -f "$BACKUP_DIR/extensions.txt" ]] && [[ -x "$AG_CLI" ]]; then
+  total=$(wc -l < "$BACKUP_DIR/extensions.txt")
+  i=0
+  while IFS= read -r ext; do
+    [[ -z "$ext" ]] && continue
+    i=$((i + 1))
+    echo "   [$i/$total] $ext"
+    "$AG_CLI" --install-extension "$ext" --force 2>/dev/null || echo "   ⚠️  失败: $ext"
+  done < "$BACKUP_DIR/extensions.txt"
+  echo "   ✅ 扩展安装完成"
+else
+  echo '   ⚠️  跳过: extensions.txt 不存在或 Antigravity CLI 不可用'
+fi
+
+echo ''
+echo '✅ 恢复完成！重启 Antigravity 以应用配置。'
+"""
+
 # ========== 维护任务 ==========
 
 [tasks.status]
@@ -200,5 +287,3 @@ for tool in $tools; do
   fi
 done
 """
-
-

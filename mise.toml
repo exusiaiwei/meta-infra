@@ -63,7 +63,122 @@ MSYS2_ARG_CONV_EXCL = "*"
 # ========== 安装任务 ==========
 
 [tasks.install]
-description = "安装所有 Winget 应用（核心 + 标准层）"
+description = "交互式安装 Winget 应用（选择模块）"
+run = """
+ROOT="${MISE_PROJECT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
+
+echo '============================================'
+echo '  📦 应用安装向导'
+echo '============================================'
+echo ''
+echo '  [核心层] (推荐全装)'
+echo '    1. core        - Git, MSYS2, Mise, Starship, Terminal, Clash Verge'
+echo ''
+echo '  [标准层] (按需选择)'
+echo '    2. tools       - PowerToys, Bitwarden, NanaZip, FastCopy...'
+echo '    3. dev         - VS Code, Cursor, Docker, GitHub CLI...'
+echo '    4. academic    - Obsidian, Zotero...'
+echo '    5. media       - PotPlayer, File Converter...'
+echo '    6. communication - 微信, QQ, Teams...'
+echo ''
+echo '  [可选层]'
+echo '    7. gaming      - Steam, Battle.net...'
+echo '    8. security    - 火绒安全'
+echo '    9. cloud       - OneDrive, Google Drive...'
+echo '   10. nvidia      - NVIDIA 工具'
+echo '   11. amd         - AMD 工具'
+echo ''
+echo '  快捷选项:'
+echo '    A. 全部安装 (1-6)'
+echo '    Q. 退出'
+echo ''
+printf '请输入编号 (逗号分隔, 如 1,2,3): '
+read choice
+
+if [[ "$choice" == "Q" || "$choice" == "q" ]]; then
+  echo '已跳过安装'
+  exit 0
+fi
+
+# 展开快捷选项 A
+if [[ "$choice" == "A" || "$choice" == "a" ]]; then
+  choice="1,2,3,4,5,6"
+fi
+
+for c in ${(s:,:)choice}; do
+  c=$(echo "$c" | tr -d ' ')
+  case $c in
+    1)
+      echo ''
+      echo '>> [1/核心层] core...'
+      winget.exe configure "$ROOT/manifests/core/base.yaml" --accept-configuration-agreements
+      ;;
+    2)
+      echo ''
+      echo '>> [2/标准层] tools...'
+      winget.exe configure "$ROOT/manifests/standard/tools.yaml" --accept-configuration-agreements
+      ;;
+    3)
+      echo ''
+      echo '>> [3/标准层] dev...'
+      winget.exe configure "$ROOT/manifests/standard/dev.yaml" --accept-configuration-agreements
+      ;;
+    4)
+      echo ''
+      echo '>> [4/标准层] academic...'
+      winget.exe configure "$ROOT/manifests/standard/academic.yaml" --accept-configuration-agreements
+      ;;
+    5)
+      echo ''
+      echo '>> [5/标准层] media...'
+      winget.exe configure "$ROOT/manifests/standard/media.yaml" --accept-configuration-agreements
+      ;;
+    6)
+      echo ''
+      echo '>> [6/标准层] communication...'
+      winget.exe configure "$ROOT/manifests/standard/communication.yaml" --accept-configuration-agreements
+      ;;
+    7)
+      echo ''
+      echo '>> [7/可选层] gaming...'
+      winget.exe configure "$ROOT/manifests/optional/gaming.yaml" --accept-configuration-agreements
+      ;;
+    8)
+      echo ''
+      echo '>> [8/可选层] security...'
+      winget.exe configure "$ROOT/manifests/optional/security.yaml" --accept-configuration-agreements
+      ;;
+    9)
+      echo ''
+      echo '>> [9/可选层] cloud...'
+      winget.exe configure "$ROOT/manifests/optional/cloud.yaml" --accept-configuration-agreements
+      ;;
+    10)
+      echo ''
+      echo '>> [10/可选层] nvidia...'
+      winget.exe configure "$ROOT/manifests/optional/hardware-nvidia.yaml" --accept-configuration-agreements
+      ;;
+    11)
+      echo ''
+      echo '>> [11/可选层] amd...'
+      winget.exe configure "$ROOT/manifests/optional/hardware-amd.yaml" --accept-configuration-agreements
+      ;;
+    *)
+      echo "   ⚠️  未知选项: $c"
+      ;;
+  esac
+done
+
+echo ''
+echo '✅ 安装完成！'
+"""
+
+[tasks."install:core"]
+description = "仅安装核心层（无交互）"
+run = "winget.exe configure \"${MISE_PROJECT_ROOT}/manifests/core/base.yaml\" --accept-configuration-agreements"
+
+[tasks."install:all"]
+description = "安装全部（核心 + 标准层，无交互）"
 run = """
 ROOT="${MISE_PROJECT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 echo '>> 安装核心层...'
@@ -73,33 +188,7 @@ for f in "$ROOT"/manifests/standard/*.yaml; do
   echo "  安装: $(basename $f)"
   winget.exe configure "$f" --accept-configuration-agreements
 done
-echo '✅ 所有应用安装完成'
-"""
-
-[tasks."install:core"]
-description = "仅安装核心层"
-run = "winget.exe configure \"${MISE_PROJECT_ROOT}/manifests/core/base.yaml\" --accept-configuration-agreements"
-
-[tasks."install:optional"]
-description = "安装可选模块（交互式选择）"
-run = """
-echo '可选模块:'
-echo '  1. gaming     - 游戏平台'
-echo '  2. security   - 火绒安全'
-echo '  3. cloud      - 云存储'
-echo '  4. nvidia     - NVIDIA 工具'
-echo '  5. amd        - AMD 工具'
-echo ''
-read 'choice?请输入编号(逗号分隔): '
-for c in ${(s:,:)choice}; do
-  case $c in
-    1) winget.exe configure manifests/optional/gaming.yaml --accept-configuration-agreements ;;
-    2) winget.exe configure manifests/optional/security.yaml --accept-configuration-agreements ;;
-    3) winget.exe configure manifests/optional/cloud.yaml --accept-configuration-agreements ;;
-    4) winget.exe configure manifests/optional/hardware-nvidia.yaml --accept-configuration-agreements ;;
-    5) winget.exe configure manifests/optional/hardware-amd.yaml --accept-configuration-agreements ;;
-  esac
-done
+echo '✅ 全部安装完成'
 """
 
 # ========== 配置任务 ==========
@@ -165,7 +254,7 @@ echo '>> 备份 keybindings.json...'
 cp "$AG_CONFIG/keybindings.json" "$BACKUP_DIR/keybindings.json" 2>/dev/null || echo '   (跳过: keybindings.json 不存在)'
 
 echo '>> 导出扩展列表...'
-if [[ -x "$AG_CLI" ]]; then
+if [[ -f "$AG_CLI" ]]; then
   "$AG_CLI" --list-extensions 2>/dev/null | grep -v '^[[]' > "$BACKUP_DIR/extensions.txt"
 else
   # 从扩展目录直接读取
@@ -210,7 +299,7 @@ if [[ -f "$BACKUP_DIR/keybindings.json" ]]; then
 fi
 
 echo '>> 安装扩展...'
-if [[ -f "$BACKUP_DIR/extensions.txt" ]] && [[ -x "$AG_CLI" ]]; then
+if [[ -f "$BACKUP_DIR/extensions.txt" ]] && [[ -f "$AG_CLI" ]]; then
   total=$(wc -l < "$BACKUP_DIR/extensions.txt")
   i=0
   while IFS= read -r ext; do

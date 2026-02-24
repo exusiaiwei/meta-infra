@@ -193,6 +193,23 @@ function Start-Bootstrap {
     Write-Host "阶段 4/4: 自动安装 (zsh + mise)" -ForegroundColor Yellow
     Write-Host ""
 
+    # 确保 zsh 已安装（MSYS2 默认只带 bash）
+    $BASH_EXE = "C:\msys64\usr\bin\bash.exe"
+    if (-not (Test-Path $ZSH_EXE)) {
+        if (Test-Path $BASH_EXE) {
+            Write-Step "安装 zsh (pacman)..."
+            $env:MSYSTEM = "MSYS"
+            $env:CHERE_INVOKING = "1"
+            & $BASH_EXE -lc "pacman -S --noconfirm --needed zsh"
+        }
+    }
+    if (-not (Test-Path $ZSH_EXE)) {
+        Write-Host "[错误] 找不到 zsh: $ZSH_EXE" -ForegroundColor Red
+        Write-Host "  请确认 MSYS2 已正确安装" -ForegroundColor Yellow
+        exit 1
+    }
+    Write-Step "zsh 已就绪 ✓" "Green"
+
     # 将 Windows 路径转为 MSYS2 路径
     $msysPath = $INSTALL_DIR -replace '\\','/' -replace '^C:','/c'
     # Windows 风格路径给 winget 用

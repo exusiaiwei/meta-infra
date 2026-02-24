@@ -28,6 +28,11 @@ if ! grep -qi microsoft /proc/version 2>/dev/null; then
   fi
 fi
 
+# ---------- 免密 sudo (仅限个人开发环境) ----------
+echo ">> 配置免密码 sudo..."
+echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$USER >/dev/null
+sudo chmod 0440 /etc/sudoers.d/$USER
+
 # ---------- 系统更新 ----------
 echo ">> 更新系统包..."
 sudo apt update && sudo apt upgrade -y

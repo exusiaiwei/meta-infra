@@ -195,6 +195,8 @@ function Start-Bootstrap {
 
     # 将 Windows 路径转为 MSYS2 路径
     $msysPath = $INSTALL_DIR -replace '\\','/' -replace '^C:','/c'
+    # Windows 风格路径给 winget 用
+    $winPath = $INSTALL_DIR -replace '/','\\'
 
     # 构建 zsh 要执行的脚本
     $zshScript = @"
@@ -217,11 +219,14 @@ echo '============================================'
 echo '  安装 GUI 应用 (winget configure)'
 echo '============================================'
 
-# 安装核心 + 标准层
-winget.exe configure manifests/core/base.yaml --accept-configuration-agreements 2>/dev/null
+# 安装核心 + 标准层（用 Windows 绝对路径，避免 MSYS2 路径转换）
+MSYS2_ARG_CONV_EXCL="*"
+export MSYS2_ARG_CONV_EXCL
+winget.exe configure "$winPath\manifests\core\base.yaml" --accept-configuration-agreements 2>/dev/null
 for f in manifests/standard/*.yaml; do
-  echo "  安装: `$f"
-  winget.exe configure "`$f" --accept-configuration-agreements 2>/dev/null
+  fname=`$(basename "`$f")
+  echo "  安装: `$fname"
+  winget.exe configure "$winPath\manifests\standard\`$fname" --accept-configuration-agreements 2>/dev/null
 done
 
 echo ''

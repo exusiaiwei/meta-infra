@@ -83,10 +83,6 @@ echo '    6. communication - 微信, QQ, Teams...'
 echo ''
 echo '  [可选层]'
 echo '    7. gaming      - Steam, Battle.net...'
-echo '    8. security    - 火绒安全'
-echo '    9. cloud       - OneDrive, Google Drive...'
-echo '   10. nvidia      - NVIDIA 工具'
-echo '   11. amd         - AMD 工具'
 echo ''
 echo '  快捷选项:'
 echo '    A. 全部安装 (1-6)'
@@ -145,26 +141,6 @@ for c in ${(s:,:)choice}; do
       echo ''
       echo '>> [7/可选层] gaming...'
       winget.exe configure "$ROOT/manifests/optional/gaming.yaml" --accept-configuration-agreements
-      ;;
-    8)
-      echo ''
-      echo '>> [8/可选层] security...'
-      winget.exe configure "$ROOT/manifests/optional/security.yaml" --accept-configuration-agreements
-      ;;
-    9)
-      echo ''
-      echo '>> [9/可选层] cloud...'
-      winget.exe configure "$ROOT/manifests/optional/cloud.yaml" --accept-configuration-agreements
-      ;;
-    10)
-      echo ''
-      echo '>> [10/可选层] nvidia...'
-      winget.exe configure "$ROOT/manifests/optional/hardware-nvidia.yaml" --accept-configuration-agreements
-      ;;
-    11)
-      echo ''
-      echo '>> [11/可选层] amd...'
-      winget.exe configure "$ROOT/manifests/optional/hardware-amd.yaml" --accept-configuration-agreements
       ;;
     *)
       echo "   ⚠️  未知选项: $c"

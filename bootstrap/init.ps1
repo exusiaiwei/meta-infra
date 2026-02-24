@@ -222,10 +222,19 @@ function Start-Bootstrap {
     }
     Write-Step "zsh 已就绪 ✓" "Green"
 
-    # 启用 winget configure 功能
-    Write-Step "启用 winget configure..."
-    winget configure --enable 2>$null
-    Write-Step "winget configure 已启用 ✓" "Green"
+    # 启用 winget configure 功能（超时 60 秒，Store 未就绪则跳过）
+    Write-Step "启用 winget configure（最多等 60 秒）..."
+    $configJob = Start-Job { winget configure --enable 2>$null }
+    $configReady = Wait-Job $configJob -Timeout 60
+    if ($configReady) {
+        Remove-Job $configJob -Force
+        Write-Step "winget configure 已启用 ✓" "Green"
+        $env:WINGET_USE_CONFIGURE = "1"
+    } else {
+        Stop-Job $configJob; Remove-Job $configJob -Force
+        Write-Host "[警告] winget configure 启用超时（Store 未就绪），将改用 winget install" -ForegroundColor Yellow
+        $env:WINGET_USE_CONFIGURE = "0"
+    }
 
     # 配置 Windows Terminal（在 PowerShell 里做，避免 python3 依赖）
     $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"

@@ -31,6 +31,7 @@
 | Clash Verge | `ClashVergeRev.ClashVergeRev` | 代理客户端 |
 | AdGuard | `AdGuard.AdGuard` | 广告拦截 |
 | Pot | `Pylogmon.pot` | 翻译 |
+| Tailscale | `Tailscale.Tailscale` | 设备互联 VPN |
 | FastCopy | `FastCopy.FastCopy` | 快速复制 |
 | Geek Uninstaller | `GeekUninstaller.GeekUninstaller` | 卸载工具 |
 | Microsoft Edge | `Microsoft.Edge` | 浏览器 |
@@ -40,15 +41,18 @@
 |------|-----------|------|
 | VS Code | `Microsoft.VisualStudioCode` | 代码编辑器 |
 | Cursor | `Anysphere.Cursor` | AI 代码编辑器 |
+| Antigravity | `Google.Antigravity` | Google AI 编辑器 |
 | VS Build Tools | `Microsoft.VisualStudio.2022.BuildTools` | C++ 编译环境 |
 | Docker Desktop | `Docker.DockerDesktop` | 容器 |
 | GitHub CLI | `GitHub.cli` | GitHub 命令行 |
+| WSL | `Microsoft.WSL` | Windows Subsystem for Linux |
 
 #### Academic — 学术工具
 | 软件 | Winget ID | 用途 |
 |------|-----------|------|
 | Obsidian | `Obsidian.Obsidian` | 笔记 |
 | Zotero | `DigitalScholar.Zotero` | 文献管理 |
+| Microsoft 365 | `Microsoft.Office` | Office 套件 |
 
 #### Media — 多媒体
 | 软件 | Winget ID | 用途 |
@@ -92,11 +96,13 @@
 | Pixi | `pixi = "latest"` | Python/Conda 包管理 |
 | Claude Code | `npm:@anthropic-ai/claude-code` | AI CLI |
 | Gemini CLI | `npm:@google/gemini-cli` | AI CLI |
+| Typst | `ubi:typst/typst` | 排版系统 |
+| Quarto | `ubi:quarto-dev/quarto-cli` | 文档系统 |
 
 ---
 
 ## 📊 统计
 
-- **Winget GUI 应用**: ~30 个
-- **Mise CLI 工具**: 8 个
-- **总计**: ~38 个软件包
+- **Winget GUI 应用**: ~35 个
+- **Mise CLI 工具**: 10 个
+- **总计**: ~45 个软件包

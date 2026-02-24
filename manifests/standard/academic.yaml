@@ -2,7 +2,8 @@
 # ================================================================================================
 # meta-infra - Standard: Academic
 # ================================================================================================
-# 学术工具（笔记、文献管理）
+# 学术工具（笔记、文献管理、Office）
+# 排版工具 (Typst/Quarto) 由 mise.toml 管理
 # 优先级：推荐
 # ================================================================================================
 
@@ -21,5 +22,12 @@ properties:
       id: zotero
       settings:
         id: DigitalScholar.Zotero
+        source: winget
+
+    # === Office ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: office365
+      settings:
+        id: Microsoft.Office
         source: winget
   configurationVersion: 0.2.0

@@ -2,8 +2,8 @@
 # ================================================================================================
 # meta-infra - Standard: Development
 # ================================================================================================
-# Development environment (IDE, editors, build tools, containers)
-# Priority: Recommended
+# 开发环境（IDE、编辑器、构建工具、容器、WSL）
+# 优先级：推荐
 # ================================================================================================
 
 $schema: https://aka.ms/configuration-dsc-schema/0.2
@@ -20,6 +20,12 @@ properties:
       id: cursor
       settings:
         id: Anysphere.Cursor
+        source: winget
+
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: antigravity
+      settings:
+        id: Google.Antigravity
         source: winget
 
     # === C++ Build Environment ===
@@ -40,5 +46,12 @@ properties:
       id: github_cli
       settings:
         id: GitHub.cli
+        source: winget
+
+    # === WSL ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: wsl
+      settings:
+        id: Microsoft.WSL
         source: winget
   configurationVersion: 0.2.0

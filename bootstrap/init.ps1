@@ -205,12 +205,30 @@ zsh scripts/sync-dotfiles.sh 2>&1 || echo '[警告] Dotfiles 同步失败'
 
 echo ''
 echo '============================================'
+echo '  配置 WSL 环境'
+echo '============================================'
+if command -v wsl.exe &>/dev/null; then
+  # 检测 WSL 是否已初始化（有默认发行版）
+  if wsl.exe -l -q 2>/dev/null | head -1 | grep -qi '[a-z]'; then
+    echo '检测到 WSL 已安装，自动配置中...'
+    wsl.exe -e bash -c "$(cat scripts/setup-wsl.sh)" 2>&1 || echo '[警告] WSL 配置失败'
+  else
+    echo 'WSL 已安装但未初始化发行版'
+    echo '请先运行: wsl.exe --install -d Ubuntu'
+    echo '然后重启，再运行: mise run setup:wsl'
+  fi
+else
+  echo 'WSL 未安装，跳过'
+fi
+
+echo ''
+echo '============================================'
 echo '  ✅ 全自动安装完成！'
 echo '============================================'
 echo ''
 echo '还需要手动完成的:'
 echo '  1. mise run setup:git   → 配置 Git 用户信息 + SSH 密钥'
-echo '  2. mise run setup:wsl   → 配置 WSL 环境（可选）'
+echo '  2. 如果 WSL 未初始化: wsl --install -d Ubuntu → 重启 → mise run setup:wsl'
 echo ''
 "@
 

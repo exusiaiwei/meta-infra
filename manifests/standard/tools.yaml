@@ -71,6 +71,12 @@ properties:
         id: AdGuard.AdGuard
         source: winget
 
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: tailscale
+      settings:
+        id: Tailscale.Tailscale
+        source: winget
+
     # === Translation ===
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: pot

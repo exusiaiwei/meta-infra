@@ -81,13 +81,22 @@ if (-not (Get-Command "chezmoi" -ErrorAction SilentlyContinue)) {
 }
 Write-Step "chezmoi ✓" "Green"
 
-# 4. 一键部署
+# 4. 清理上次可能失败的残留状态
+$chezmoiSource = "$env:USERPROFILE\.local\share\chezmoi"
+$chezmoiConfig = "$env:USERPROFILE\.config\chezmoi"
+if ((Test-Path $chezmoiSource) -or (Test-Path $chezmoiConfig)) {
+    Write-Step "检测到 chezmoi 残留状态，清理中..."
+    Remove-Item -Recurse -Force $chezmoiSource -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $chezmoiConfig -ErrorAction SilentlyContinue
+    Write-Step "清理完成 ✓" "Green"
+}
+
+# 5. 一键部署
 Write-Host ""
 Write-Step "开始部署..."
 Write-Host ""
 
-# --source 指向 meta-infra 仓库（不是默认的 dotfiles）
-chezmoi init --apply --source "$env:USERPROFILE\.local\share\chezmoi" "https://github.com/exusiaiwei/meta-infra.git"
+chezmoi init --apply "https://github.com/exusiaiwei/meta-infra.git"
 
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Green

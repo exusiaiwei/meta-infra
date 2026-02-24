@@ -105,6 +105,9 @@ if [[ "$choice" == "A" || "$choice" == "a" ]]; then
   choice="1,2,3,4,5,6"
 fi
 
+# 统一分隔符：中文逗号、空格、分号 → 英文逗号
+choice=$(echo "$choice" | sed 's/，/,/g; s/；/,/g; s/ /,/g')
+
 for c in ${(s:,:)choice}; do
   c=$(echo "$c" | tr -d ' ')
   case $c in

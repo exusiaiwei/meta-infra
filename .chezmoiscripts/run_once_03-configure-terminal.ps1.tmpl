@@ -7,31 +7,21 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 $ErrorActionPreference = "Continue"
 
 $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-$wtSettingsDir = Split-Path $wtSettingsPath -Parent
-
-# Windows Terminal may not have been launched yet after install
-# The LocalState folder and settings.json won't exist until first launch
-if (-not (Test-Path $wtSettingsDir)) {
-    Write-Host "   Windows Terminal not yet initialized, launching briefly..." -ForegroundColor DarkGray
-    # Try to launch and close WT to generate default settings
-    try {
-        Start-Process "wt.exe" -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 3
-        Stop-Process -Name "WindowsTerminal" -ErrorAction SilentlyContinue -Force
-        Start-Sleep -Seconds 1
-    } catch {
-        Write-Host "   Could not auto-launch WT" -ForegroundColor DarkGray
-    }
-}
 
 if (-not (Test-Path $wtSettingsPath)) {
     Write-Host "   WARN Windows Terminal settings not found, skipping" -ForegroundColor Yellow
-    Write-Host "   Please launch Windows Terminal once, then run: chezmoi apply" -ForegroundColor DarkGray
+    Write-Host "   Launch Windows Terminal once, then run: chezmoi apply" -ForegroundColor DarkGray
     exit 0
 }
 
 try {
-    $wt = Get-Content $wtSettingsPath -Raw | ConvertFrom-Json
+    # Read raw content
+    $raw = Get-Content $wtSettingsPath -Raw -Encoding UTF8
+
+    # Strip JSONC comments (WT settings.json uses // comments which PowerShell can't parse)
+    $jsonClean = $raw -replace '(?m)^\s*//.*$', '' -replace '/\*[\s\S]*?\*/', ''
+
+    $wt = $jsonClean | ConvertFrom-Json
     $hasZsh = $false
     foreach ($p in $wt.profiles.list) {
         if ($p.commandline -and $p.commandline -like "*zsh*") { $hasZsh = $true; break }
@@ -54,13 +44,16 @@ try {
         $wt.profiles.list = $list.ToArray()
         $wt.defaultProfile = $zshProfile.guid
 
+        # Write back (note: comments will be lost, but WT handles this fine)
         $wt | ConvertTo-Json -Depth 10 | Set-Content $wtSettingsPath -Encoding UTF8
         Write-Host "   OK Windows Terminal: zsh added as default" -ForegroundColor Green
+        Write-Host "   NOTE: Restart Windows Terminal to apply changes" -ForegroundColor DarkGray
     } else {
         Write-Host "   OK Windows Terminal: zsh already exists" -ForegroundColor Green
     }
 } catch {
     Write-Host "   WARN Could not configure Windows Terminal: $_" -ForegroundColor Yellow
+    Write-Host "   You can manually add zsh profile in WT settings" -ForegroundColor DarkGray
 }
 
 {{ end -}}

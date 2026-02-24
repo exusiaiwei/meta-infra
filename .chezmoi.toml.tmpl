@@ -1,0 +1,6 @@
+# chezmoi 配置模板
+# 首次 chezmoi init 时会执行，询问用户信息并写入 ~/.config/chezmoi/chezmoi.toml
+
+[data]
+    email = "{{ promptStringOnce . "email" "Git email" }}"
+    name = "{{ promptStringOnce . "name" "Git username" }}"

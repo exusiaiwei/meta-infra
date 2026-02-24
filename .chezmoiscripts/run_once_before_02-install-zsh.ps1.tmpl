@@ -1,0 +1,21 @@
+{{ if eq .chezmoi.os "windows" -}}
+# =============================================================================
+# 02 - 安装 Zsh 并配置 MSYS2 插件
+# =============================================================================
+
+$ErrorActionPreference = "Continue"
+
+$BASH_EXE = "C:\msys64\usr\bin\bash.exe"
+$ZSH_EXE = "C:\msys64\usr\bin\zsh.exe"
+
+if (Test-Path $BASH_EXE) {
+    Write-Host ">> 确保 zsh + 插件已安装..." -ForegroundColor Cyan
+    $env:MSYSTEM = "MSYS"
+    $env:CHERE_INVOKING = "1"
+    & $BASH_EXE -lc "pacman -S --noconfirm --needed zsh zsh-syntax-highlighting zsh-autosuggestions"
+    Write-Host "   ✓ zsh + 插件就绪" -ForegroundColor Green
+} else {
+    Write-Host "   ⚠ MSYS2 未安装，跳过" -ForegroundColor Yellow
+}
+
+{{ end -}}

@@ -1,0 +1,29 @@
+# chezmoi 忽略规则
+# 这些文件存在于源仓库中但不会被部署到 ~ 目录
+
+# 仓库文档和元文件
+README.md
+LICENSE
+PACKAGES.md
+FRESH_INSTALL_GUIDE.md
+bootstrap.ps1
+.gitignore
+.gitattributes
+
+# meta-infra 基础设施（保留在仓库中，不部署到 HOME）
+manifests
+manifests/**
+mise.toml
+scripts
+scripts/**
+bootstrap
+bootstrap/**
+
+# 旧版 dotfiles 目录（已迁移到 chezmoi 命名）
+dotfiles
+dotfiles/**
+
+# 根据操作系统忽略
+{{ if ne .chezmoi.os "windows" }}
+AppData/**
+{{ end }}

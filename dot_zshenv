@@ -44,6 +44,14 @@ _add_path "/c/Program Files/starship/bin"
 # Pixi（如果存在）
 _add_path "$HOME/.pixi/bin"
 
+# chezmoi
+() {
+  setopt localoptions nullglob
+  for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/twpayne.chezmoi_*; do
+    _add_path "$d"
+  done
+}
+
 unset -f _add_path
 
 # 编辑器

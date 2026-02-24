@@ -1,0 +1,48 @@
+{{ if eq .chezmoi.os "windows" -}}
+# =============================================================================
+# 03 - 配置 Windows Terminal (zsh 设为默认)
+# =============================================================================
+
+$ErrorActionPreference = "Continue"
+
+$wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+
+if (-not (Test-Path $wtSettingsPath)) {
+    Write-Host "   ⚠ Windows Terminal 配置未找到，跳过" -ForegroundColor Yellow
+    exit 0
+}
+
+try {
+    $wt = Get-Content $wtSettingsPath -Raw | ConvertFrom-Json
+    $hasZsh = $false
+    foreach ($p in $wt.profiles.list) {
+        if ($p.commandline -and $p.commandline -like "*zsh*") { $hasZsh = $true; break }
+    }
+
+    if (-not $hasZsh) {
+        Copy-Item $wtSettingsPath "${wtSettingsPath}.bak"
+
+        $zshProfile = @{
+            guid              = "{17da3cac-b318-431e-8a3e-7fcdefe6d114}"
+            name              = "zsh"
+            commandline       = "C:\msys64\usr\bin\zsh.exe --login"
+            icon              = "C:\msys64\msys2.ico"
+            startingDirectory = "%USERPROFILE%"
+            env               = @{ MSYSTEM = "MSYS"; CHERE_INVOKING = "1" }
+        }
+
+        $list = [System.Collections.ArrayList]@($wt.profiles.list)
+        $list.Insert(0, $zshProfile)
+        $wt.profiles.list = $list.ToArray()
+        $wt.defaultProfile = $zshProfile.guid
+
+        $wt | ConvertTo-Json -Depth 10 | Set-Content $wtSettingsPath -Encoding UTF8
+        Write-Host "   ✓ Windows Terminal: zsh 已添加并设为默认" -ForegroundColor Green
+    } else {
+        Write-Host "   ✓ Windows Terminal: zsh 已存在" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "   ⚠ 无法配置 Windows Terminal: $_" -ForegroundColor Yellow
+}
+
+{{ end -}}

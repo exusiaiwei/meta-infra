@@ -39,22 +39,8 @@ echo '============================================'
 echo '  安装 GUI 应用 (winget configure)'
 echo '============================================'
 
-# 启用 winget configure 功能（实验性功能，需先开启）
-WINGET_SETTINGS="/c/Users/${USERNAME}/AppData/Local/Packages/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe/LocalState/settings.json"
-if [[ -f "$WINGET_SETTINGS" ]]; then
-  python3 -c "
-import json, os
-f = r'$(cygpath -w "$WINGET_SETTINGS")'
-try:
-    with open(f, 'r', encoding='utf-8-sig') as fp: s = json.load(fp)
-except: s = {}
-s.setdefault('experimentalFeatures', {})['configuration'] = True
-with open(f, 'w', encoding='utf-8') as fp: json.dump(s, fp, indent=4)
-print('  ✓ winget configure 功能已启用')
-" 2>&1 || echo '  [警告] 无法修改 winget 设置'
-fi
-
 # 禁止 MSYS2 自动转换 winget.exe 的参数路径
+# (winget configure 实验功能已在 init.ps1 中用 PowerShell 启用)
 export MSYS2_ARG_CONV_EXCL="*"
 
 winget.exe configure "$REPO_WIN\manifests\core\base.yaml" --accept-configuration-agreements 2>/dev/null
@@ -69,9 +55,6 @@ echo '============================================'
 echo '  同步 Dotfiles'
 echo '============================================'
 zsh "$REPO_MSYS/scripts/sync-dotfiles.sh" 2>&1 || echo '[警告] Dotfiles 同步失败'
-
-echo ''
-zsh "$REPO_MSYS/scripts/setup-terminal.sh" 2>&1 || echo '[警告] Windows Terminal 配置失败'
 
 echo ''
 echo '============================================'

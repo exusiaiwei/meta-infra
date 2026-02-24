@@ -222,6 +222,54 @@ function Start-Bootstrap {
     }
     Write-Step "zsh 已就绪 ✓" "Green"
 
+    # 启用 winget configure 实验功能（在 PowerShell 里做，避免 python3 依赖）
+    $wingetSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json"
+    if (Test-Path $wingetSettingsPath) {
+        try {
+            $ws = Get-Content $wingetSettingsPath -Raw | ConvertFrom-Json
+            if (-not $ws.experimentalFeatures) {
+                $ws | Add-Member -NotePropertyName "experimentalFeatures" -NotePropertyValue @{} -Force
+            }
+            $ws.experimentalFeatures | Add-Member -NotePropertyName "configuration" -NotePropertyValue $true -Force
+            $ws | ConvertTo-Json -Depth 10 | Set-Content $wingetSettingsPath -Encoding UTF8
+            Write-Step "winget configure 已启用 ✓" "Green"
+        } catch {
+            Write-Host "[警告] 无法修改 winget 设置" -ForegroundColor Yellow
+        }
+    }
+
+    # 配置 Windows Terminal（在 PowerShell 里做，避免 python3 依赖）
+    $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+    if (Test-Path $wtSettingsPath) {
+        try {
+            $wt = Get-Content $wtSettingsPath -Raw | ConvertFrom-Json
+            $hasZsh = $false
+            foreach ($p in $wt.profiles.list) {
+                if ($p.commandline -and $p.commandline -like "*zsh*") { $hasZsh = $true; break }
+            }
+            if (-not $hasZsh) {
+                $zshProfile = @{
+                    guid = "{17da3cac-b318-431e-8a3e-7fcdefe6d114}"
+                    name = "zsh"
+                    commandline = "C:\msys64\usr\bin\zsh.exe --login"
+                    icon = "C:\msys64\msys2.ico"
+                    startingDirectory = "%USERPROFILE%"
+                    env = @{ MSYSTEM = "MSYS"; CHERE_INVOKING = "1" }
+                }
+                $list = [System.Collections.ArrayList]@($wt.profiles.list)
+                $list.Insert(0, $zshProfile)
+                $wt.profiles.list = $list.ToArray()
+                $wt.defaultProfile = $zshProfile.guid
+                $wt | ConvertTo-Json -Depth 10 | Set-Content $wtSettingsPath -Encoding UTF8
+                Write-Step "Windows Terminal: zsh 已添加并设为默认 ✓" "Green"
+            } else {
+                Write-Step "Windows Terminal: zsh 已存在 ✓" "Green"
+            }
+        } catch {
+            Write-Host "[警告] 无法配置 Windows Terminal: $_" -ForegroundColor Yellow
+        }
+    }
+
     # 调用独立的 zsh 安装脚本（避免 PowerShell here-string 转义问题）
     $msysPath = $INSTALL_DIR -replace '\\','/' -replace '^C:','/c'
     Write-Step "启动 zsh 自动安装..."

@@ -30,4 +30,11 @@ properties:
       settings:
         id: Microsoft.Office
         source: winget
+
+    # === 排版与文档 ===
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: quarto
+      settings:
+        id: Posit.Quarto
+        source: winget
   configurationVersion: 0.2.0

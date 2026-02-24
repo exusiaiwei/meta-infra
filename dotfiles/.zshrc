@@ -21,9 +21,12 @@ bindkey -e  # Emacs 模式
 # syntax-highlighting: 命令实时彩色高亮
 # autosuggestions: 灰色补全历史命令
 for plugin in zsh-syntax-highlighting zsh-autosuggestions; do
-  # MSYS2 路径
+  # git clone 安装路径（首选）
+  [[ -f $HOME/.zsh/plugins/$plugin/$plugin.zsh ]] && \
+    source $HOME/.zsh/plugins/$plugin/$plugin.zsh && continue
+  # MSYS2 pacman 路径
   [[ -f /usr/share/zsh/plugins/$plugin/$plugin.zsh ]] && \
-    source /usr/share/zsh/plugins/$plugin/$plugin.zsh
+    source /usr/share/zsh/plugins/$plugin/$plugin.zsh && continue
   # Ubuntu/Debian 路径
   [[ -f /usr/share/$plugin/$plugin.zsh ]] && \
     source /usr/share/$plugin/$plugin.zsh

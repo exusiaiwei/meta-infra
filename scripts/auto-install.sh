@@ -14,9 +14,19 @@ export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 cd "$REPO_MSYS" || { echo "[错误] 无法进入目录: $REPO_MSYS"; exit 1; }
 
 echo '============================================'
-echo '  安装 Zsh 插件 (pacman)'
+echo '  安装 Zsh 插件'
 echo '============================================'
-pacman -S --noconfirm --needed zsh-syntax-highlighting zsh-autosuggestions 2>&1 || echo '[警告] Zsh 插件安装失败'
+ZSH_PLUGIN_DIR="${HOME}/.zsh/plugins"
+mkdir -p "$ZSH_PLUGIN_DIR"
+
+for plugin in zsh-syntax-highlighting zsh-autosuggestions; do
+  if [[ -d "$ZSH_PLUGIN_DIR/$plugin" ]]; then
+    echo "  ✓ $plugin (已安装)"
+  else
+    echo "  + 安装 $plugin..."
+    git clone --depth 1 "https://github.com/zsh-users/$plugin.git" "$ZSH_PLUGIN_DIR/$plugin" 2>&1 || echo "  [警告] $plugin 安装失败"
+  fi
+done
 
 echo ''
 echo '============================================'

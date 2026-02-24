@@ -9,12 +9,19 @@ set -e
 
 # ---------- 路径修复 ----------
 export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
-# 确保 Windows 工具可用
-for p in "/c/Windows/System32" "/c/Windows" "/c/Program Files/Git/cmd" \
-         "/c/Users/$USERNAME/AppData/Local/Microsoft/WinGet/Links" \
-         "/c/Users/$USERNAME/.local/bin"; do
-  [[ -d "$p" ]] && export PATH="$PATH:$p"
+_add_path() { [[ -d "$1" ]] && export PATH="$1:$PATH"; }
+_add_path "/c/Windows/System32"
+_add_path "/c/Windows"
+_add_path "$HOME/AppData/Local/Microsoft/WinGet/Links"
+_add_path "$HOME/.local/share/mise/bin"
+_add_path "$HOME/.local/bin"
+_add_path "/c/Program Files/starship/bin"
+_add_path "$HOME/.pixi/bin"
+for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/jdx.mise_*/mise/bin; do
+  _add_path "$d"
 done
+_add_path "/c/Program Files/Git/cmd"
+unset -f _add_path
 
 REPO_DIR="${0:a:h:h}"  # 脚本所在目录的父目录
 cd "$REPO_DIR"

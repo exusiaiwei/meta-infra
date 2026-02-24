@@ -17,15 +17,31 @@ fi
 # MSYS2 工具链
 export PATH="/clangarm64/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
-# Mise（如果存在）
-if [ -d "$HOME/.local/share/mise/bin" ]; then
-  export PATH="$HOME/.local/share/mise/bin:$PATH"
-fi
+# 动态添加路径（存在才加）
+_add_path() { [[ -d "$1" ]] && export PATH="$1:$PATH"; }
+
+# Windows 系统路径（winget/系统工具需要）
+_add_path "/c/Windows/System32"
+_add_path "/c/Windows"
+
+# WinGet Links（winget 安装的 CLI 工具快捷方式）
+_add_path "$HOME/AppData/Local/Microsoft/WinGet/Links"
+
+# Mise（多种安装方式）
+_add_path "$HOME/.local/share/mise/bin"
+_add_path "$HOME/.local/bin"
+# winget 安装的 mise（路径很长，动态查找）
+for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/jdx.mise_*/mise/bin; do
+  _add_path "$d"
+done
+
+# Starship
+_add_path "/c/Program Files/starship/bin"
 
 # Pixi（如果存在）
-if [ -d "$HOME/.pixi/bin" ]; then
-  export PATH="$HOME/.pixi/bin:$PATH"
-fi
+_add_path "$HOME/.pixi/bin"
+
+unset -f _add_path
 
 # 编辑器
 export EDITOR="code"

@@ -37,10 +37,20 @@ pixi = "latest"           # 现代 Python/Conda 包管理器
 "github:quarto-dev/quarto-cli" = "latest"    # Quarto 文档系统
 
 # ========================================
+# 设置
+# ========================================
+[settings]
+# mise.exe 在 Windows 上默认用 cmd /c 执行 inline 任务，
+# 但我们的任务全部用 zsh 语法（export, for, if 等），
+# 所以必须显式指定用 MSYS2 的 zsh 来执行。
+windows_default_inline_shell_args = ["C:\\msys64\\usr\\bin\\zsh.exe", "-c"]
+
+# ========================================
 # 环境变量
 # ========================================
 [env]
-# EDITOR = "code"
+# 阻止 MSYS2 自动转换 winget 等命令的路径参数
+MSYS2_ARG_CONV_EXCL = "*"
 
 # ========================================
 # 任务定义
@@ -55,7 +65,6 @@ pixi = "latest"           # 现代 Python/Conda 包管理器
 [tasks.install]
 description = "安装所有 Winget 应用（核心 + 标准层）"
 run = """
-export MSYS2_ARG_CONV_EXCL="*"
 ROOT="${MISE_PROJECT_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 echo '>> 安装核心层...'
 winget.exe configure "$ROOT/manifests/core/base.yaml" --accept-configuration-agreements
@@ -69,7 +78,7 @@ echo '✅ 所有应用安装完成'
 
 [tasks."install:core"]
 description = "仅安装核心层"
-run = "export MSYS2_ARG_CONV_EXCL='*' && winget.exe configure \"${MISE_PROJECT_ROOT}/manifests/core/base.yaml\" --accept-configuration-agreements"
+run = "winget.exe configure \"${MISE_PROJECT_ROOT}/manifests/core/base.yaml\" --accept-configuration-agreements"
 
 [tasks."install:optional"]
 description = "安装可选模块（交互式选择）"

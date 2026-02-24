@@ -31,9 +31,12 @@ _add_path "$HOME/AppData/Local/Microsoft/WinGet/Links"
 _add_path "$HOME/.local/share/mise/bin"
 _add_path "$HOME/.local/bin"
 # winget 安装的 mise（路径很长，动态查找）
-for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/jdx.mise_*/mise/bin; do
-  _add_path "$d"
-done
+() {
+  setopt localoptions nullglob
+  for d in "$HOME/AppData/Local/Microsoft/WinGet/Packages"/jdx.mise_*/mise/bin; do
+    _add_path "$d"
+  done
+}
 
 # Starship
 _add_path "/c/Program Files/starship/bin"

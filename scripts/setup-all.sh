@@ -5,7 +5,8 @@
 # 用法: cd ~/_Meta/meta-infra && zsh scripts/setup-all.sh
 # ============================================================
 
-set -e
+# nullglob: glob 无匹配时返回空而非报错
+setopt nullglob
 
 # ---------- 路径修复 ----------
 export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"

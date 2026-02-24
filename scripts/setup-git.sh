@@ -62,7 +62,7 @@ if [[ ! -f "$SSH_KEY" ]]; then
   echo ""
   email=$(git config --global user.email)
   hostname=$(hostname 2>/dev/null || echo "unknown")
-  default_comment="${email}@${hostname}"
+  default_comment="$(whoami)@${hostname}"
   read "comment?SSH 密钥备注 [${default_comment}]: "
   comment="${comment:-$default_comment}"
 

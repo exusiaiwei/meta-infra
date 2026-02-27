@@ -11,30 +11,7 @@
 # 文档：https://mise.jdx.dev/
 # ================================================================================================
 
-# ========================================
-# 工具版本管理
-# ========================================
 
-[tools]
-# --- 核心语言运行时 ---
-python = "3.12"           # Python 解释器（固定版本，稳定）
-node = "lts"              # Node.js LTS 版本
-
-# --- 数据处理工具 ---
-jq = "latest"             # JSON 查询和处理
-yq = "latest"             # YAML/XML 查询和处理
-ripgrep = "latest"        # 快速文本搜索（rg 命令）
-
-# --- Python 包管理 ---
-pixi = "latest"           # 现代 Python/Conda 包管理器
-
-# --- AI CLI 工具（通过 npm 安装）---
-"npm:@anthropic-ai/claude-code" = "latest"   # Claude Code CLI
-"npm:@google/gemini-cli" = "latest"          # Gemini CLI
-
-# --- 文档与排版（通过 github backend，从 GitHub releases 安装）---
-"github:typst/typst" = "latest"              # Typst 排版系统
-"github:quarto-dev/quarto-cli" = "latest"    # Quarto 文档系统
 
 # ========================================
 # 设置

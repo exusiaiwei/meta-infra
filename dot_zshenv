@@ -26,6 +26,7 @@ _add_path "/c/Windows"
 _add_path "$HOME/AppData/Local/Microsoft/WinGet/Links"
 
 # Mise
+export MISE_GLOBAL_CONFIG_FILE="$HOME/_Meta/meta-infra/mise.toml"
 _add_path "$HOME/.local/share/mise/bin"
 _add_path "$HOME/.local/bin"
 _add_path "$HOME/AppData/Local/Programs/mise/bin"

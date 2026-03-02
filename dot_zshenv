@@ -30,6 +30,7 @@ _add_path "$HOME/.local/share/mise/bin"
 _add_path "$HOME/.local/bin"
 _add_path "$HOME/AppData/Local/Programs/mise/bin"
 _add_path "$HOME/AppData/Local/mise/bin"
+_add_path "$HOME/AppData/Local/mise/shims"
 () {
   setopt localoptions nullglob
   local pkg_base="$HOME/AppData/Local/Microsoft/WinGet/Packages"

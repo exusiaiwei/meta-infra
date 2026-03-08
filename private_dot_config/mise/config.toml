@@ -20,9 +20,10 @@ ripgrep = "latest"        # 快速文本搜索（rg 命令）
 # --- Python 包管理 ---
 pixi = "latest"           # 现代 Python/Conda 包管理器
 
-# --- AI CLI 工具（通过 npm 安装）---
-"npm:@anthropic-ai/claude-code" = "latest"   # Claude Code CLI
-"npm:@google/gemini-cli" = "latest"          # Gemini CLI
+# --- AI CLI 工具 ---
+# 注意：claude-code 和 gemini-cli 有内置自动升级机制，
+# 与 mise 的版本管理冲突会导致卡住。请用 npm 直接安装：
+#   npm install -g @anthropic-ai/claude-code @google/gemini-cli
 
 # --- 文档与排版（通过 github backend，从 GitHub releases 安装）---
 "github:typst/typst" = "latest"              # Typst 排版系统

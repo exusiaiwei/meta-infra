@@ -1,7 +1,10 @@
 # =============================================================================
 # .zshenv — 所有 zsh 实例都会加载（包括非交互式，如 AI agent 调用）
 # =============================================================================
-# 这个文件只设置 PATH 和环境变量，不做任何交互式配置
+# 设计原则：
+#   1. 不重置 PATH — 完整继承 Windows PATH，确保所有工具可用
+#   2. 只在 PATH 前面添加必要的工具路径
+#   3. 用 symlink 解决 starship 路径含空格的问题（根因）
 
 # ---------- HOME 目录统一 ----------
 if [[ -d "/c/Users" ]] && [[ "$HOME" == /home/* ]]; then
@@ -12,44 +15,46 @@ if [[ -d "/c/Users" ]] && [[ "$HOME" == /home/* ]]; then
   unset _user
 fi
 
-# MSYS2 工具链
-export PATH="/clangarm64/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
-
-# 动态添加路径（存在才加）
-_add_path() { [[ -d "$1" ]] && export PATH="$1:$PATH"; }
-
-# Windows 系统路径
-_add_path "/c/Windows/System32"
-_add_path "/c/Windows"
-
-# WinGet Links
-_add_path "$HOME/AppData/Local/Microsoft/WinGet/Links"
+# ---------- 路径前置（不重置 PATH） ----------
+_prepend_path() {
+  [[ -d "$1" ]] || return
+  case ":$PATH:" in
+    *":$1:"*) return ;;
+  esac
+  export PATH="$1:$PATH"
+}
 
 # Mise
-_add_path "$HOME/.local/share/mise/bin"
-_add_path "$HOME/.local/bin"
-_add_path "$HOME/AppData/Local/Programs/mise/bin"
-_add_path "$HOME/AppData/Local/mise/bin"
-_add_path "$HOME/AppData/Local/mise/shims"
+_prepend_path "$HOME/.local/share/mise/shims"
+_prepend_path "$HOME/.local/share/mise/bin"
+_prepend_path "$HOME/.local/bin"
+_prepend_path "$HOME/AppData/Local/mise/shims"
+_prepend_path "$HOME/AppData/Local/mise/bin"
+_prepend_path "$HOME/AppData/Local/Programs/mise/bin"
 () {
   setopt localoptions nullglob
   local pkg_base="$HOME/AppData/Local/Microsoft/WinGet/Packages"
-  for d in "$pkg_base"/jdx.mise_*/mise/bin; do _add_path "$d"; done
-  for d in "$pkg_base"/twpayne.chezmoi_*; do _add_path "$d"; done
+  for d in "$pkg_base"/jdx.mise_*/mise/bin; do _prepend_path "$d"; done
+  for d in "$pkg_base"/twpayne.chezmoi_*; do _prepend_path "$d"; done
 }
 
-# Starship
-_add_path "/c/Program Files/starship/bin"
-
 # Pixi
-_add_path "$HOME/.pixi/bin"
+_prepend_path "$HOME/.pixi/bin"
 
-unset -f _add_path
+# Starship — symlink 到无空格路径
+# 根因：starship init zsh 会把自身路径嵌入生成的 zsh 代码，
+# 如果路径含空格（如 /c/Program Files/starship/bin/starship），
+# eval 执行时会被 word splitting 截断导致报错。
+# 解决方案：创建 symlink，让 command -v starship 返回 /usr/local/bin/starship
+if [[ -x "/c/Program Files/starship/bin/starship.exe" ]] && [[ ! -e "/usr/local/bin/starship" ]]; then
+  mkdir -p /usr/local/bin 2>/dev/null
+  ln -sf "/c/Program Files/starship/bin/starship.exe" "/usr/local/bin/starship" 2>/dev/null
+fi
 
-# 编辑器
+unset -f _prepend_path
+
+# ---------- 环境变量 ----------
 export EDITOR="code"
 export VISUAL="code"
-
-# 语言
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"

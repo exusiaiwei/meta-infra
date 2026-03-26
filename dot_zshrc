@@ -2,9 +2,8 @@
 # .zshrc — 仅交互式 shell 加载
 # =============================================================================
 
-# Re-source .zshenv: login shell 中 /etc/profile 会重置 PATH，
-# 导致 .zshenv 里添加的 mise/chezmoi 等路径丢失
-[[ -f ~/.zshenv ]] && source ~/.zshenv
+# 注意：不再需要重新 source .zshenv
+# .zshenv 现在只做 prepend，不重置 PATH，/etc/profile 不会丢失工具路径
 
 # ---------- History ----------
 HISTFILE=~/.zsh_history
